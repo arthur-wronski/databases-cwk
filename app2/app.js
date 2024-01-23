@@ -6,6 +6,9 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var filmInfoRouter = require('./routes/filmInfo');
+//var genreRouter = require('./routes/genres');
+
 
 var app = express();
 
@@ -20,7 +23,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('indexFolder'))
 
-app.use('/db', indexRouter);
+app.use('/films', indexRouter);
+//app.use('/genres', genreRouter);
+//app.use('/film-info', filmInfoRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler

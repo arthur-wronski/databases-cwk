@@ -2,7 +2,6 @@
 var express = require('express');
 const { resolve } = require('styled-jsx/css');
 var router = express.Router();
-
 const mysql = require('mysql2/promise')
 const pool = mysql.createPool({
   host: 'localhost',

@@ -5,7 +5,7 @@ html
   body
     h1= title
     
-    form(action='/db/search', method='GET')
+    form(action='/films/search', method='GET')
       label(for='query') Enter Query:
       input(type='text', name='query', id='query')
       button(type='submit') Search
@@ -19,5 +19,5 @@ html
         each row in data
           tr
             td
-              a(href='/db/' + row.tagId)= row.tagId
+              a(href='/film-info/' + row.tagId)= row.tagId
             td= row.tag ? row.tag : 'Null'
