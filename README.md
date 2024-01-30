@@ -7,4 +7,5 @@
 - website formatted to show attributes on corresponding pages
 - add query (and otherwise) security to the db and system
 - make the website look nice
+- index page have users log in (firebase?)
 - global website & load balancing (simulate locally with multiple containers)
