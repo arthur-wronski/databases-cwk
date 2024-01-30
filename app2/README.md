@@ -21,5 +21,22 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-SELECT * FROM Viewer LIMIT 10;
+SELECT * FROM Viewer LIMIT 10; (this checks that the database is set up)
+
+exit (exits SQL shell)
+
+docker build -t db-app .
+docker run -p 3000:3000 -d db-app
+
+docker ps (check name of Ed's container)
+
+docker network connect network (name of SQL container)
+docker network connect network (name of Ed's container)
+
+
+
+
+docker network create network
+
+
 
