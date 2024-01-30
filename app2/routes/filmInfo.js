@@ -1,32 +1,28 @@
 'use strict'
 var express = require('express');
-const { resolve } = require('styled-jsx/css');
 var router = express.Router();
-const mysql = require('mysql2/promise')
-const pool = mysql.createPool({
-  host: 'localhost',
-  user: 'root',
-  password: 'idonthaveone',
-  database: 'coursework',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-})
+var pool = require('./db');
+
+
+/* GET users listing. */
 router.get('/:tagId', async function(req, res) {
-    let connection;
-  
-    try {
-      connection = await pool.getConnection();
-  
-      const tagId = req.params.tagId;
-      const sqlQuery = 'SELECT * FROM tags WHERE tagId = ?;';
-      const [rows, fields] = await connection.execute(sqlQuery, [tagId]);
-  
-      res.render('filmInfo', { title: 'Database', data: rows });
-    } catch (err) {
-      console.error('Error executing database query:', err);
-      res.status(500).send('Internal Server Error');
-    } finally {
-      if (connection) connection.release();
-    }
+  let connection;
+
+  try {
+    connection = await pool.getConnection();
+
+    const tagId = req.params.tagId;
+    const sqlQuery = 'SELECT * FROM tags WHERE tagId = ?;';
+    const [rows, fields] = await connection.execute(sqlQuery, [tagId]);
+
+    // also need to get the viewers of the film and show them on this page. Click to show that viewers info??
+    res.render('filmInfo', { title: 'FilmInfo-'+tagId, data: rows[0] });
+  } catch (err) {
+    console.error('Error from filmInfo/tagId:', err);
+    res.render('error', { message: 'from filmInfo/tagId', error: err});
+  } finally {
+    if (connection) connection.release();
+  }
 })
+
+module.exports = router;
