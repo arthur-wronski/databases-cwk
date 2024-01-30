@@ -1,6 +1,12 @@
 docker run -d --name (choose a container name) -e MYSQL_ROOT_PASSWORD=(choose a password) -e MYSQL_DATABASE=MovieLens -p 3306:3306 mysql:latest
 
-docker cp ../data/. (container name):/var/lib/mysql/csv_data
+docker exec -it (container name) mysql -u root -p
+
+SHOW VARIABLES LIKE 'secure_file_priv'; (this will give you the path from which you are allowed to import the csv file)
+
+exit (exits mySQL)
+
+docker cp ../data/. (container name):(path from previous operation)
 
 docker exec -it (container name) mysql -u root -p
 
@@ -14,7 +20,7 @@ CREATE TABLE IF NOT EXISTS Viewer (
     PRIMARY KEY (userId, movieId)
 );
 
-LOAD DATA INFILE '/var/lib/mysql/csv_data/ratings.csv' 
+LOAD DATA INFILE '(path to ratings.csv, e.g. /var/lib/mysql/csv_data/ratings.csv for me)' 
 INTO TABLE Viewer 
 FIELDS TERMINATED BY ',' 
 ENCLOSED BY '"' 
