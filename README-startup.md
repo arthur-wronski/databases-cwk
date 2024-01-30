@@ -48,7 +48,7 @@ exit
 docker build -t db-app .
 docker run -p 3000:3000 -d --name app-cont db-app
 
-# check app is running and check name of db-app container
+# check app is running
 docker ps
 
 docker network create network
