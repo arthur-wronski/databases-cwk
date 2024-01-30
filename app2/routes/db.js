@@ -1,9 +1,9 @@
 const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
-  host: 'databases-cwk-db-1', //replace with your container name
+  host: 'db-cont', //replace with your container name
   user: 'root',
-  password: 'my-secret-pw', //replace with your password
+  password: 'pass', //replace with your password
   database: 'MovieLens', 
   waitForConnections: true,
   connectionLimit: 10,
