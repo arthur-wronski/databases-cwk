@@ -44,7 +44,7 @@ SELECT * FROM Viewer LIMIT 10;
 # exit mySQL
 exit
 
-# run the web application
+# cd app2 to run the web application
 docker build -t db-app .
 docker run -p 3000:3000 -d --name app-cont db-app
 
