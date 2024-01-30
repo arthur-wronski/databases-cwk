@@ -9,7 +9,7 @@ router.get('/', async function(req, res) {
 
   try {
     connection = await pool.getConnection();
-    const sqlQuery = 'SELECT * FROM tags;';
+    const sqlQuery = 'SELECT * FROM Viewer;';
     const [rows, fields] = await connection.execute(sqlQuery);
     res.render('films', { title: 'Films', data: rows });
   } catch (err) {
@@ -31,7 +31,7 @@ router.get('/search', async function(req, res) {
     if (req.query.query) query = req.query.query;
     else query = '%';
 
-    const sqlQuery = 'SELECT * FROM tags WHERE tag LIKE ?;';
+    const sqlQuery = 'SELECT * FROM Viewer WHERE movieId LIKE ?;';
     const [rows, fields] = await connection.execute(sqlQuery, [`%${query}%`]);
     res.render('films', { title: 'Films', data: rows });
   } catch (err) {

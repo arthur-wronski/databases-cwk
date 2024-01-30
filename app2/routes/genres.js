@@ -12,7 +12,7 @@ router.get('/:film', async function(req, res) {
 
     const film = req.params.film;
     // get list of genres from film
-    const sqlQuery = 'SELECT * FROM tags;';     // show film's genres only
+    const sqlQuery = 'SELECT * FROM Viewer;';     // show film's genres only
     const [rows, fields] = await connection.execute(sqlQuery);
     res.render('genres', { title: 'Genres of '+film, data: rows });
   } catch (err) {

@@ -12,7 +12,7 @@ router.get('/:genre', async function(req, res) {
     connection = await pool.getConnection();
 
     const genre = req.params.genre;
-    const sqlQuery = 'SELECT * FROM tags WHERE tagId = ?;';
+    const sqlQuery = 'SELECT * FROM Viewer WHERE movieId = ?;';
     const [rows, fields] = await connection.execute(sqlQuery, [genre]);
 
     res.render('genreInfo', { title: 'GenreInfo-'+genre, data: rows[0] });

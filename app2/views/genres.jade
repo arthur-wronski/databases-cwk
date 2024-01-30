@@ -43,11 +43,11 @@ html
     table
       thead
         tr
-          th TagId
-          th Tag
+          th UserId
+          th MovieId
       tbody
         each row in data
           tr
             td
-              a(href='/genre/' + row.tagId)= row.tagId
-            td= row.tag ? row.tag : 'Null'
+              a(href='/info/' + row.userId)= row.userId
+            td= row.movieId
