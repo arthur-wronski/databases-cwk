@@ -55,3 +55,5 @@ docker network create network
 
 docker network connect network db-cont
 docker network connect network app-cont
+
+# check out the website running from localhost:3000
