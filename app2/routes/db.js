@@ -1,9 +1,10 @@
 const mysql = require('mysql2/promise');
 
+/* pooling allows multiple simultaneous db access */
 const pool = mysql.createPool({
-  host: 'db-cont', //replace with your container name
+  host: 'db-cont',
   user: 'root',
-  password: 'pass', //replace with your password
+  password: 'pass',
   database: 'MovieLens', 
   waitForConnections: true,
   connectionLimit: 10,

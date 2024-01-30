@@ -2,8 +2,9 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET all of table */
+/* start page to view data */
 router.get('/', async function(req, res) {
+  // frontend render on index.jade
   res.render('index', { title: 'Databases Coursework' });
 });
 
