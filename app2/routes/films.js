@@ -2,6 +2,7 @@
 var express = require('express');
 var router = express.Router();
 var pool = require('./db');     // retrieve pool from db.js
+var InputSanitizer = require('./inputsanitizer'); // import sanitizer
 
 /* show whole films table */
 router.get('/', async function(req, res) {
@@ -27,9 +28,8 @@ router.get('/search', async function(req, res) {
   try {
     connection = await pool.getConnection();
 
-    let query;
-    if (req.query.query) query = req.query.query;
-    else query = '%';
+    // Sanitize the query parameter
+    let query = InputSanitizer.sanitizeString(req.query.query || '%');
 
     const sqlQuery = 'SELECT * FROM Viewer WHERE movieId LIKE ?;';              // select subset
     const [rows, fields] = await connection.execute(sqlQuery, [`%${query}%`]);  // pooled connection to db

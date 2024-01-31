@@ -2,7 +2,7 @@
 var express = require('express');
 var router = express.Router();
 var pool = require('./db');     // retrieve pool from db.js
-
+var InputSanitizer = require('./inputsanitizer'); // import sanitizer
 
 /* show more info about the chosen genre */
 router.get('/:genre', async function(req, res) {
@@ -11,7 +11,9 @@ router.get('/:genre', async function(req, res) {
   try {
     connection = await pool.getConnection();
 
-    const genre = req.params.genre;
+    // Sanitize the genre parameter
+    const genre = InputSanitizer.sanitizeString(req.params.genre);
+
     const sqlQuery = 'SELECT * FROM Viewer WHERE movieId = ?;';             // select subset
     const [rows, fields] = await connection.execute(sqlQuery, [genre]);     // pooled connection to db
 
