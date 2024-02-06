@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+    title= title
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/films') Films] #[a(href='/genres') Genres]
+    table
+      thead
+        tr
+          th Movie
+          th Rating
+          th Timestamp
+      tbody
+        each i in userData.length  // idk correct way to do this
+          tr
+            td= movieRated[i]
+            td= rating[i] 
+            td= ratingTimestamp[i]

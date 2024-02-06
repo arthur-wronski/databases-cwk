@@ -1,0 +1,11 @@
+doctype html
+html
+  head
+    title= title
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/films') Films] #[a(href='/genres') Genres]

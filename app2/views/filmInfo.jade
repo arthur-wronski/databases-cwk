@@ -1,0 +1,43 @@
+doctype html
+html
+  head
+    title= title
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+
+  body
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/films') Films] #[a(href='/genres') Genres]
+    p Movie: #{movieData.title}
+    p Genres: #{movieData.genres}
+    p Rating: #{movieData.ratingAv}
+
+    table
+      thead
+        tr
+          th Genre
+          th Average Rating
+      tbody
+        each g in genreData
+          tr
+            td
+              a(href='/genre/' + g.genreId)= g.genre
+            td= g.ratingAv
+    p
+      a(href='/genres')= see all genres
+
+    table
+      thead
+        tr
+          th Viewer-Id
+          th Rating
+          th Timestamp
+      tbody
+        each user in viewers
+          tr
+            td
+              a(href='/user/' + user.userId)= user.userId
+            td= user.rating[/* how do we find this movie's part? */]
+            td= user.rateTimestamp[/* how do we find this movie's part? */]

@@ -1,0 +1,30 @@
+doctype html
+html
+  head
+    title= title
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/films') Films] #[a(href='/genres') Genres]
+    
+    form(action='/films/search', method='GET')
+      label(for='searchQuery')
+      input(type='text', name='searchQuery', id='searchQuery', placeholder='search keywords')
+      button(type='submit') Search
+
+    table
+      thead
+        tr
+          th Movie
+          th Rating
+          th Genres
+      tbody
+        each row in data
+          tr
+            td
+              a(href='/info/' + row.movieId)= row.title
+            td= row.rating-av 
+            td= row.genres // each link to the genre page

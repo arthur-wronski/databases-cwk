@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    title= title
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/films') Films] #[a(href='/genres') Genres]
+    table
+      thead
+        tr
+          th Genre
+          th Average Rating
+      tbody
+        each g in data
+          tr
+            td
+              a(href='/genre/' + g.genreId)= g.genre
+            td= g.ratingAv
