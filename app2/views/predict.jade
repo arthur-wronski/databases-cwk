@@ -20,6 +20,7 @@ html
       input(type='hidden', name='tags', value="<%= tags.concat(new_tag).join(',') %>")
     
     form(action='/predict/p', method='GET')
-      label(for='ratings')
-      input(type='number', name='ratings', id='ratings', placeholder='add preview rating')
-      button(type='submit') Search
+      label(for='new_rating')
+      input(type='number', name='new_rating', id='new_rating', placeholder='add rating')
+      button(type='submit') Tags
+      input(type='hidden', name='previewRatings', value="<%= previewRatings.concat(new_rating).join(',') %>")

@@ -30,7 +30,7 @@ router.get('/p/', async function(req, res) {
     }
 
     // send output to response frontend
-    res.render('predict', { title: 'Predict Film Performance', tags: tags, ratingTag: tagRate, ratingView: previewRate });
+    res.render('predict', { title: 'Predict Film Performance', tags: tags, ratings: previewRatings, ratingTag: tagRate, ratingView: previewRate });
   } catch (err) {
     console.error('Error from filmInfo/movieId:', err);
     res.render('error', { message: 'from filmInfo/movieId', error: err});
