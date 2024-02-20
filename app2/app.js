@@ -10,7 +10,7 @@ var filmInfoRouter = require('./routes/filmInfo');
 var genreListRouter = require('./routes/genres');
 var genreInfoRouter = require('./routes/genreInfo');
 var userRouter = require('./routes/userInfo');
-var ratingsRouter = require('./routes/ratings');
+var predictRouter = require('./routes/predict');
 
 
 var app = express();
@@ -32,7 +32,7 @@ app.use('/info', filmInfoRouter);
 app.use('/genres', genreListRouter);
 app.use('/genre', genreInfoRouter);
 app.use('/user', userRouter);
-app.use('/ratings', ratingsRouter);
+app.use('/predict', predictRouter);
 
 
 
