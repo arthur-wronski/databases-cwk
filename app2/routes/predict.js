@@ -2,38 +2,69 @@
 var express = require('express');
 var router = express.Router();
 var pool = require('./db');     // retrieve pool from db.js
-
+var InputSanitizer = require('./inputsanitizer'); // import sanitizer
 
 /* using multiple features predict the performance of a film */
-router.get('/p/', async function(req, res) {
+router.get('/add_tag/', async function(req, res) {
   let connection;
 
   try {
     connection = await pool.getConnection();
     let tags = req.query.tags;
-    let previewRatings = req.query.ratings;
+    let previews = req.query.previews;
+    let tagRate = req.query.tagRate;
+    let previewRate = req.query.previewRate;
 
-    // average movie ratings by relevance to chosen tags
-    let tagRate = 0;
-    for (var i=0; i<tags.length; i++){
-        const getMovies = 'SELECT tags, ratingAv FROM Movies;';
-        const [movies, fields] = await connection.execute(getMovies);
-        for (var j=0; j<movies.length; j++){
-            tagRate += movies[j].tags[i] * movies[j].ratingAv;
-        }
-    }
+    // find new tag's id
+    const tag_query = InputSanitizer.sanitizeString(req.query.new_tag || '%');
+    const search_tag = 'SELECT tagId FROM Tags WHERE tag LIKE ?;';
+    const [allTags, fieldT] = await connection.execute(search_tag, [tag_query]);
+    let new_tag = allTags[0];
 
-    // average rating deduced by previews
-    let previewRate = 0;
-    for (var i=0; i<previewRatings.length; i++){
-        previewRate += previewRatings[i] / previewRatings.length;
-    }
+    // decipher predicted rating of new tag
+    const getMovies = 'SELECT tags, ratingAv FROM Movies;';
+    const [movies, fieldM] = await connection.execute(getMovies);
+    let new_tag_rating;
+    for (var i=0; i<movies.length; i++){
+      // some method of balancing each movie's use by its value at movie.tags[tag.tagId]
+      // could use ML for this @Ghalia?
+    }    
+
+    // balance use of each tag given
+    tagRate *= tags.length;
+    tags.push(new_tag.tag);
+    tagRate = (tagRate + tag_rating) / tags.length
 
     // send output to response frontend
-    res.render('predict', { title: 'Predict Film Performance', tags: tags, ratings: previewRatings, ratingTag: tagRate, ratingView: previewRate });
+    res.render('predict', { title: 'Predict Film Performance', tags: tags, previews: previews, tagRate: tagRate, previewRate: previewRate });
   } catch (err) {
-    console.error('Error from filmInfo/movieId:', err);
-    res.render('error', { message: 'from filmInfo/movieId', error: err});
+    console.error('Error from predict/p:', err);
+    res.render('error', { message: 'from predict/p', error: err});
+  } finally {
+    if (connection) connection.release();
+  }
+})
+
+router.get('/add_review/', async function(req, res) {
+  let connection;
+
+  try {
+    connection = await pool.getConnection();
+    let tags = req.query.tags;
+    let previews = req.query.previews;
+    let tagRate = req.query.tagRate;
+    let previewRate = req.query.previewRate;
+
+    let new_review = InputSanitizer.sanitizeString(req.query.next_review || '%');
+    previewRate *= previews.length;
+    previews.push(new_review);
+    previewRate = (previewRate + new_review) / previous.length;
+
+    // send output to response frontend
+    res.render('predict', { title: 'Predict Film Performance', tags: tags, previews: previous, tagRate: tagRate, previewRate: previewRate });
+  } catch (err) {
+    console.error('Error from predict/p:', err);
+    res.render('error', { message: 'from predict/p', error: err});
   } finally {
     if (connection) connection.release();
   }
@@ -47,8 +78,8 @@ router.get('/', async function(req, res) {
       connection = await pool.getConnection();
       res.render('predict', { title: 'Predict Film Performance', tags: [], ratingTag: 0, ratingView: 0 });
     } catch (err) {
-      console.error('Error from filmInfo/movieId:', err);
-      res.render('error', { message: 'from filmInfo/movieId', error: err});
+      console.error('Error from predict:', err);
+      res.render('error', { message: 'from predict', error: err});
     } finally {
       if (connection) connection.release();
     }
