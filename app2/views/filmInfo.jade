@@ -11,7 +11,6 @@ html
       .dropdown-content
         p: #[a(href='/films') Films] #[a(href='/genres') Genres]
     p Movie: #{movieData.title}
-    p Genres: #{movieData.genres}
     p Rating: #{movieData.ratingAv}
 
     table
@@ -20,24 +19,24 @@ html
           th Genre
           th Average Rating
       tbody
-        each g in genreData
+        each genre in movieGenres
           tr
             td
-              a(href='/genre/' + g.genreId)= g.genre
-            td= g.ratingAv
+              a(href='/genre/' + genre.genreId)= genre.genre
+            td= genre.ratingAv
     p
       a(href='/genres')= see all genres
 
     table
       thead
         tr
-          th Viewer-Id
+          th Viewer
           th Rating
           th Timestamp
       tbody
-        each user in viewers
+        each review in viewers
           tr
             td
-              a(href='/user/' + user.userId)= user.userId
-            td= user.rating[/* how do we find this movie's part? */]
-            td= user.rateTimestamp[/* how do we find this movie's part? */]
+              a(href='/user/' + review.userId)= review.userId
+            td= review.rating
+            td= review.rateTimestamp

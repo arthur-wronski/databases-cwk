@@ -10,18 +10,23 @@ router.get('/:movieId', async function(req, res) {
 
   try {
     connection = await pool.getConnection();
-
     const movieId = req.params.movieId;
-    const getMovie = 'SELECT * FROM Movies WHERE movieId = ?;';                     // select one row using primary key
-    const [rowsMovie, fieldsM] = await connection.execute(getMovie, [movieId]);     // get info of the movie
-    const movie = rowsMovie[0];
-    const getViewers = 'SELECT * FROM Users WHERE ANY (movie-rated) = ?;';          // select from array
-    const [users, fieldsV] = await connection.execute(getViewers, [movieId]);       // get all users who have watched movie
-    const getGenres = 'SELECT * FROM Genres WHERE genreId IN ?;';
-    const [genres, fieldsG] = await connection.execute(getGenres, [movie.genres]);  // get all genres of the movie
-    // sort genres by average rating
 
-    res.render('filmInfo', { title: 'FilmInfo: '+movie.title, movieData: movie, viewers: users, genreData: genre });
+    // select the chosen movie using its primary key
+    const getMovie = 'SELECT * FROM Movies WHERE movieId = ?;';
+    const [rowsMovie, fieldsM] = await connection.execute(getMovie, [movieId]);
+    const movie = rowsMovie[0]; // only one as primary
+
+    // select the genres of this movie
+    const getGenres = 'SELECT genreId, genre, ratingAv FROM Genres WHERE genreId IN ? ORDER BY rating;';
+    const [genres, fieldsG] = await connection.execute(getGenres, [movie.genres]);
+
+    // select all the users who viewed this movie
+    const getViewers = 'SELECT userId, rating, rateTimestamp FROM Users WHERE movieRated = ?;';
+    const [viewers, fieldsV] = await connection.execute(getViewers, [movieId]);
+
+    // send output to response frontend
+    res.render('filmInfo', { title: 'FilmInfo: '+movie.title, movieData: movie, movieGenres: genres, movieViewers: viewers });
   } catch (err) {
     console.error('Error from filmInfo/movieId:', err);
     res.render('error', { message: 'from filmInfo/movieId', error: err});

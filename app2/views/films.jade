@@ -20,11 +20,9 @@ html
         tr
           th Movie
           th Rating
-          th Genres
       tbody
-        each row in data
+        each movie in movies
           tr
             td
-              a(href='/info/' + row.movieId)= row.title
-            td= row.rating-av 
-            td= row.genres // each link to the genre page
+              a(href='/info/' + movie.movieId)= movie.title
+            td= movie.ratingAv
