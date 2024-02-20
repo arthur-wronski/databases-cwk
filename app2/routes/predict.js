@@ -2,7 +2,7 @@
 var express = require('express');
 var router = express.Router();
 var pool = require('./db');     // retrieve pool from db.js
-var InputSanitizer = require('./inputsanitizer'); // import sanitizer
+var InputSanitizer = require('./inputsanitizer');
 
 /* using multiple features predict the performance of a film */
 router.get('/add_tag/', async function(req, res) {
