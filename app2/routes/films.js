@@ -30,7 +30,7 @@ router.get('/search', async function(req, res) {
 
     let searchQuery = req.query.searchQuery;
     // order these by relation to tags
-    const sqlQuery = 'SELECT movieId, title, genres, rating-av FROM Movies WHERE title LIKE ? OR genre LIKE ?;';
+    const sqlQuery = 'SELECT title, genres, rating-av FROM Movies WHERE title LIKE ? OR genre LIKE ?;';
     const [rows, fields] = await connection.execute(sqlQuery, [`%${searchQuery}%`]);  // pooled connection to db
 
     res.render('films', { title: 'Films', data: rows });                              // send output to response frontend
