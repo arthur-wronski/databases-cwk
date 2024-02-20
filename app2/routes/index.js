@@ -6,8 +6,6 @@ var router = express.Router();
 router.get('/', async function(req, res) {
   // frontend render on index.jade
   res.render('index', { title: 'Databases Coursework' });
-
-  // add option to predict a film's rating based on tags and tag-related films ratings
 });
 
 module.exports = router;

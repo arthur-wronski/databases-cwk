@@ -31,7 +31,6 @@ app.use('/films', filmListRouter);
 app.use('/info', filmInfoRouter);
 app.use('/genres', genreListRouter);
 app.use('/genre', genreInfoRouter);
-app.use('/user', userRouter);
 app.use('/predict', predictRouter);
 
 
