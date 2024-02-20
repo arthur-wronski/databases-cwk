@@ -2,21 +2,41 @@ doctype html
 html
   head
     title= title
-    //-
-      body covers whole page
-      h1 covers header
-    style.
-      body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f4f4f4;
-      }
-  
-      h1 {
-        color: #333;
-      }
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
 
   body
-    h1= title
-    p User: #{data.userId}
-    p Movie: #{data.movieId}
-    p Rating: #{data.rating}
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+    p Movie: #{movieData.title}
+    p Rating: #{movieData.ratingAv}
+
+    table
+      thead
+        tr
+          th Genre
+          th Average Rating
+      tbody
+        each genre in movieGenres
+          tr
+            td
+              a(href='/genre/' + genre.genreId)= genre.genre
+            td= genre.ratingAv
+    p
+      a(href='/genres')= see all genres
+
+    table
+      thead
+        tr
+          th Viewer
+          th Rating
+          th Timestamp
+      tbody
+        each review in viewers
+          tr
+            td
+              a(href='/user/' + review.userId)= review.userId
+            td= review.rating
+            td= review.rateTimestamp
