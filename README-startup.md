@@ -58,3 +58,11 @@ docker network connect network db-cont
 docker network connect network app-cont
 
 # check out the website running from localhost:3000
+
+# RESTART
+
+# first end the running of app-cont from docker and delete it
+# then from terminal (still in app2)
+docker build -t db-app .
+docker run -p 3000:3000 -d --name app-cont db-app
+docker network connect network app-cont
