@@ -2,21 +2,15 @@ doctype html
 html
   head
     title= title
-    //-
-      body covers whole page
-      h1 covers header
-    style.
-      body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f4f4f4;
-      }
-  
-      h1 {
-        color: #333;
-      }
-
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    h1= title
-    p User: #{data.userId}
-    p Movie: #{data.movieId}
-    p Rating: #{data.rating}
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/films') Films] #[a(href='/genres') Genres]
+    p Rating Average: #{genreData.ratingAv}
+    //- make distribution into a graph
+    p Rating Distribution: #{genreData.ratingDistribution}
+    p 
+      a(href='/genres')= see all genres
