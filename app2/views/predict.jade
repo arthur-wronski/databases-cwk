@@ -13,13 +13,18 @@ html
     p Predicted Rating by Tag: #{tagRate}
     p Predicted Rating by Previews: #{previewRate}
 
-    form(action='/predict/p', method='GET')
-      label(for='new_tag')
-      input(type='text', name='new_tag', id='new_tag', placeholder='add tag')
+    form(action='/predict/add_tag', method='GET')
+      label(for='next_tag')
+      input(type='text', name='next_tag', id='next_tag', placeholder='add tag')
       button(type='submit') Tags
-      input(type='hidden', name='tags', value="<%= tags.concat(new_tag).join(',') %>")
-    
-    form(action='/predict/p', method='GET')
-      label(for='ratings')
-      input(type='number', name='ratings', id='ratings', placeholder='add preview rating')
-      button(type='submit') Search
+      input(type='hidden', name='tags', value="<%= tags %>")
+      input(type='hidden', name='tagRate', value="<%= tagRate %>")
+      input(type='hidden', name='previewRate', value="<%= previewRate %>")
+
+    form(action='/predict/add_review', method='GET')
+      label(for='next_review')
+      input(type='number', name='next_review', id='next_review', placeholder='add review')
+      button(type='submit')
+      input(type='hidden', name='tags', value="<%= tags %>")
+      input(type='hidden', name='tagRate', value="<%= tagRate %>")
+      input(type='hidden', name='previewRate', value="<%= previewRate %>")
