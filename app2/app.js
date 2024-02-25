@@ -5,11 +5,10 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var filmListRouter = require('./routes/films');
+var filmRouter = require('./routes/films');
 var filmInfoRouter = require('./routes/filmInfo');
 var genreListRouter = require('./routes/genres');
 var genreInfoRouter = require('./routes/genreInfo');
-var predictRouter = require('./routes/predict');
 
 
 var app = express();
@@ -26,11 +25,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('indexFolder'))
 
 app.use('/', indexRouter);
-app.use('/films', filmListRouter);
+app.use('/films', filmRouter);
 app.use('/info', filmInfoRouter);
 app.use('/genres', genreListRouter);
-app.use('/genre', genreInfoRouter);
-app.use('/predict', predictRouter);
+app.use('/genreInfo', genreInfoRouter);
 
 
 // catch 404 and forward to error handler

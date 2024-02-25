@@ -2,18 +2,23 @@ doctype html
 html
   head
     title= title
-    block stylesheets
-      link(rel='stylesheet', href='/stylesheets/style.css')
+    //-
+      body covers whole page
+      h1 covers header
+    style.
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f4;
+      }
+  
+      h1 {
+        color: #333;
+      }
   body
-    .dropdown
-      h1= title
-      .dropdown-content
-        p
-          a(href="/") Home 
-          | 
-          a(href='/films') Films
-          | 
-          a(href='/genres') Genres
-          | 
-          a(href='/predict') Predict Performance
-    p
+    h1= title
+
+    table
+      thead
+        tr
+          th 
+           a(href='/genreInfo')= 'See Genres'
