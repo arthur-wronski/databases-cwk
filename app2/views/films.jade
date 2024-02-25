@@ -10,19 +10,40 @@ html
       .dropdown-content
         p: #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
     
-    form(action='/films/search', method='GET')
-      label(for='searchQuery')
-      input(type='text', name='searchQuery', id='searchQuery', placeholder='search keywords')
+    table 
+      thead
+        each col in allCols
+          th
+            form(action='/films', method='GET')
+              input(type='hidden', name='col', id='col', value=col)
+              input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+              input(type='hidden', name='query', id='query', value='%')
+              button(type='submit') #{col}
+    
+    form(action='/films', method='GET')
+      label(for='query')
+      input(type='text', name='query', id='query', placeholder='search keywords')
+      input(type='hidden', name='col', id='col', value=col)
+      input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
       button(type='submit') Search
 
     table
       thead
         tr
-          th Movie
-          th Rating
+          each title in shownCols
+            th= title
       tbody
-        each movie in movies
-          tr
-            td
-              a(href='/info/' + movie.movieId)= movie.title
-            td= movie.ratingAv
+        each row in data
+          tr(class='row-link', data-url=`/films/${row.userId}`)
+            each title in shownCols 
+              td= row[title]
+
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.row-link').forEach(function(element) {
+          element.addEventListener('click', function() {
+            const url = this.dataset.url;
+            window.location.href = url;
+          });
+        });
+      });
