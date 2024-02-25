@@ -31,7 +31,7 @@ router.get('/', async function(req, res) {
       [movies, fields] = await connection.execute(search_Movie_Genre, [`%${related_tag}%`]);
     }
 
-    // set the used columns
+    // set the used columns as selected by the user
     const shownColQuery = req.query.shownCols;
     const colQuery = req.query.col;
     let shownCols;
