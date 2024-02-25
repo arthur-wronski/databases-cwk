@@ -55,20 +55,41 @@ html
       }
   body
     h1= title
+
+    table 
+      thead
+        each col in allCols
+          th
+            form(action='/films', method='GET')
+              input(type='hidden', name='col', id='col', value=col)
+              input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+              input(type='hidden', name='query', id='query', value='%')
+              button(type='submit') #{col}
     
-    form(action='/films/search', method='GET')
+    form(action='/films', method='GET')
       label(for='query')
       input(type='text', name='query', id='query', placeholder='search keywords')
+      input(type='hidden', name='col', id='col', value=col)
+      input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
       button(type='submit') Search
 
     table
       thead
         tr
-          th UserId
-          th MovieId
+          each title in shownCols
+            th= title
       tbody
         each row in data
-          tr
-            td
-              a(href='/info/' + row.userId)= row.userId
-            td= row.movieId
+          tr(class='row-link', data-url=`/films/${row.userId}`)
+            each title in shownCols 
+              td= row[title]
+
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.row-link').forEach(function(element) {
+          element.addEventListener('click', function() {
+            const url = this.dataset.url;
+            window.location.href = url;
+          });
+        });
+      });
