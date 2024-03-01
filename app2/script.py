@@ -18,10 +18,10 @@ def preprocess_movies(file_path):
     genres_list = list(genres_set)
     genre_to_id = {genre: i + 1 for i, genre in enumerate(genres_list)} 
 
-    with open("../data/movies.csv", 'w', newline='', encoding='utf-8') as movies_outfile:
+    with open("../data/cleaned_movies.csv", 'w', newline='', encoding='utf-8') as movies_outfile:
         writer = csv.writer(movies_outfile)
         writer.writerow(['movieId', 'title'])
-        for movie_id, title, genres in movie_genres: 
+        for movie_id, title, _ in movie_genres: 
             writer.writerow([movie_id, title])
 
     with open("../data/genres.csv", 'w', newline='', encoding='utf-8') as genres_outfile:
@@ -33,7 +33,7 @@ def preprocess_movies(file_path):
     with open("../data/movie_genres.csv", 'w', newline='', encoding='utf-8') as movie_genres_outfile:
         writer = csv.writer(movie_genres_outfile)
         writer.writerow(['movieId', 'genreId'])
-        for movie_id, title, genres in movie_genres:
+        for movie_id, _, genres in movie_genres:
             for genre in genres:
                 writer.writerow([movie_id, genre_to_id[genre]])
 
