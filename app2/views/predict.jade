@@ -1,0 +1,26 @@
+doctype html
+html
+  head
+    title= title
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+
+  body
+    .dropdown
+      h1= title
+      .dropdown-content
+        p
+          a(href="/") Home 
+          | 
+          a(href='/films') Films
+          | 
+          a(href='/genres') Genres
+          | 
+          a(href='/predict') Predict Performance
+    p
+
+    h2 Predicted Ratings
+    p Predicted Rating based on Previous Ratings: #{predictedRatingFromRatings}
+    p Predicted Rating based on Tags: #{predictedRatingFromTags}
+    p Combined Predicted Rating: #{combinedPredictedRating}
+
