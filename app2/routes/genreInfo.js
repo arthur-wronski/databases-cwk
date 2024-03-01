@@ -9,42 +9,30 @@ const genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Action', 'Come
 const ratings = [4, 3, 1, 2, 5, 4, 3, 5, 4, 4, 4, 3, 5, 1, 1]; // Example ratings for each genre
 
 /* show whole films table */
-router.get('/', async function(req, res) {
-  let connection;
-
+router.get('/:genreId', async function(req, res) {
   try {
     connection = await pool.getConnection();
-    const sqlQuery = 'SELECT * FROM Viewer LIMIT 5;'; // select all
-    const [rows, fields] = await connection.execute(sqlQuery); // pooled connection to db
-    res.render('films', { title: 'Films', data: rows }); // send output to response frontend
+    const movieId = req.params.movieId;
+
+    // select the chosen movie using its primary key
+    const getGenre = 'SELECT * FROM Genres WHERE genreId = ?;';
+    const [rowsGenre, fieldsG] = await connection.execute(getGenre, [genreId]);
+    const genre = rowsGenre[0]; // only one as primary
+
+    // join Users to Movies via MovieId to get genre list as one column
+    const getRatings = 'SELECT rating FROM (JOIN Users Movies) WHERE ? IN genres;';
+    const [ratings, fieldsR] = await connection.execute(getRatings, [genre]);
+
+    // send output to response frontend - this wants to be presented as scatter-plot
+    res.render('genreInfo', { title: 'GenreInfo: '+genre.genre, genreData: genre, ratings: ratings });
   } catch (err) {
-    console.error('Error from films/:', err);
-    res.render('error', { message: 'from films/', error: err });
+    console.error('Error from filmInfo/movieId:', err);
+    res.render('error', { message: 'from filmInfo/movieId', error: err});
   } finally {
     if (connection) connection.release();
   }
 });
 
-/* query-search the table for a subset */
-router.get('/search', async function(req, res) {
-  let connection;
-
-  try {
-    connection = await pool.getConnection();
-
-    // Sanitize the query parameter
-    let query = InputSanitizer.sanitizeString(req.query.query || '%');
-
-    const sqlQuery = 'SELECT * FROM Viewer WHERE movieId LIKE ?;'; // select subset
-    const [rows, fields] = await connection.execute(sqlQuery, [`%${query}%`]); // pooled connection to db
-    res.render('genreInfo', { title: 'Films', data: rows }); // send output to response frontend
-  } catch (err) {
-    console.error('Error from films/search:', err);
-    res.render('error', { message: 'from films/search', error: err });
-  } finally {
-    if (connection) connection.release();
-  }
-});
 
 router.get('/movieId-distribution', async function(req, res) {
   try {
