@@ -20,7 +20,7 @@ router.get('/:genreId', async function(req, res) {
     const genre = rowsGenre[0]; // only one as primary
 
     // join Users to Movies via MovieId to get genre list as one column
-    const getRatings = 'SELECT rating FROM (JOIN Users Movies) WHERE ? IN genres;';
+    const getRatings = 'SELECT * FROM Users;';//rating FROM (JOIN Users Movies) WHERE ? IN genres;';
     const [ratings, fieldsR] = await connection.execute(getRatings, [genre]);
 
     // send output to response frontend - this wants to be presented as scatter-plot
