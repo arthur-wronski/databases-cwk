@@ -13,7 +13,7 @@ router.get('/', async function(req, res) {
     // Sanitize the query parameter
     let query = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
 
-    // if search resembles a tag, movie results will be ordered by it
+    // if search resembles a tag, movie results will be ordered by it. MORE EFFICIENT IF REMOVED?
     let related_tag = -1;
     const search_tag = 'SELECT tagId FROM Tags WHERE tag LIKE ?;';
     const [tags, fieldT] = await connection.execute(search_tag, [`%${query}%`]);
