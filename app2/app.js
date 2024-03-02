@@ -9,6 +9,7 @@ var filmRouter = require('./routes/films');
 var filmInfoRouter = require('./routes/filmInfo');
 var genreListRouter = require('./routes/genres');
 var genreInfoRouter = require('./routes/genreInfo');
+var predictRouter = require('./routes/predict');
 
 
 var app = express();
@@ -29,6 +30,7 @@ app.use('/films', filmRouter);
 app.use('/info', filmInfoRouter);
 app.use('/genres', genreListRouter);
 app.use('/genreInfo', genreInfoRouter);
+app.use('/predict', predictRouter);
 
 
 // catch 404 and forward to error handler
