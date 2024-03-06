@@ -12,7 +12,7 @@ router.get('/', async function(req, res) {
 
     // Sanitize the query parameter
     let query = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
-
+    /*
     // if search resembles a tag, movie results will be ordered by it
     let related_tag = -1;
     const search_tag = 'SELECT tagId FROM Tags WHERE tag LIKE ?;';
@@ -30,6 +30,9 @@ router.get('/', async function(req, res) {
       search_Movie_Genre = `SELECT * FROM Movies WHERE title LIKE ${query} OR genre LIKE ${query} ORDER BY tags[?];`;
       [movies, fields] = await connection.execute(search_Movie_Genre, [`%${related_tag}%`]);
     }
+    */
+    let search_Movie_Genre = `SELECT * FROM Movies;`;// WHERE title LIKE % OR genre LIKE %;`;
+    let [movies, fields] = await connection.execute(search_Movie_Genre);
 
     // set the used columns as selected by the user
     const shownColQuery = req.query.shownCols;
@@ -41,7 +44,7 @@ router.get('/', async function(req, res) {
     if (colQuery!=null) shownCols = add_or_remove(allCols, shownCols, colQuery);
 
     // render the data
-    res.render('films', { title: 'Films', data: rows, allCols: allCols, shownCols: shownCols});
+    res.render('films', { title: 'Films', data: movies, allCols: allCols, shownCols: shownCols});
   } catch (err) {
     console.error('Error from films/:', err);
     res.render('error', { message: 'from films/', error: err});
