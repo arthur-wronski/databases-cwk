@@ -26,7 +26,7 @@ docker cp ../data/. mysql_container:/var/lib/mysql-files/
 # Step 4: Execute SQL scripts
 echo "Executing SQL scripts..."
 #docker exec -i mysql_container mysql -u root -p your_root_password MovieLens < init.sql
-docker exec mysql_container mysqladmin -u root --pyour_root_password
+docker exec mysql_container mysql -u root -pyour_root_password MovieLens < init.sql
 
 
 echo "Data import and SQL script execution completed."
