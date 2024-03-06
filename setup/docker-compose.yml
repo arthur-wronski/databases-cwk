@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:latest
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: 'your_root_password'
+      MYSQL_DATABASE: MovieLens
+    ports:
+      - "3001:3001"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - mynetwork
+networks:
+  mynetwork:
+    driver: bridge
+volumes:
+  db-data:
