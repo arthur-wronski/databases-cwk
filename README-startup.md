@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS Viewer (
     PRIMARY KEY (userId, movieId)
 );
 
-# will need to do this for each table
 LOAD DATA INFILE '/var/lib/mysql-files/ratings.csv' 
 INTO TABLE Viewer 
 FIELDS TERMINATED BY ',' 
@@ -38,7 +37,6 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-# check Viewer table contains loaded data
 SELECT * FROM Viewer LIMIT 10;
 
 # exit mySQL
