@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS MovieGenres (
     FOREIGN KEY (genreId) REFERENCES Genres(genreId)
 );
 
-LOAD DATA INFILE '/var/lib/mysql/csv_data/ratings.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/ratings.csv'
 INTO TABLE Viewer
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'

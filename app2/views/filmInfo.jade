@@ -7,36 +7,44 @@ html
 
   body
     .dropdown
-      h1= title
+      h1= movie.title
       .dropdown-content
         p: #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
-    p Movie: #{movieData.title}
-    p Rating: #{movieData.ratingAv}
+    
 
+    table 
+      thead 
+        td= movie.movieId
+        td= movie.title
+    
     table
       thead
         tr
-          th Genre
-          th Average Rating
+          th
+           p: #[a(href='/genres') Genres]
       tbody
-        each genre in movieGenres
-          tr
-            td
-              a(href='/genre/' + genre.genreId)= genre.genre
-            td= genre.ratingAv
-    p
-      a(href='/genres')= see all genres
-
+        each genre in genres 
+          td= genre.name
+    
     table
       thead
         tr
-          th Viewer
-          th Rating
+          th User 
+          th Rating 
           th Timestamp
       tbody
-        each review in viewers
-          tr
-            td
-              a(href='/user/' + review.userId)= review.userId
-            td= review.rating
-            td= review.rateTimestamp
+        each viewer in viewers
+          tr(class='row-link', data-url=`/userInfo/${viewer.userId}`)
+            td= viewer.userId 
+            td= viewer.rating 
+            td= viewer.timestamp 
+    
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.row-link').forEach(function(element) {
+          element.addEventListener('click', function() {
+            const url = this.dataset.url;
+            window.location.href = url;
+          });
+        });
+      });
