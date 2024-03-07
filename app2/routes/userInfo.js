@@ -14,7 +14,7 @@ router.get('/:userId', async function(req, res) {
     let userId = req.params.userId;
     
     // only take subset to improve processing
-    let getRatings = `SELECT Viewer.movieId, Movies.title, Viewer.rating, Viewer.timestamp FROM Viewer INNER JOIN Movies ON (Viewer.movieId=Movies.genreId) WHERE userId=?;`;
+    let getRatings = `SELECT Viewer.movieId, Movies.title, Viewer.rating, Viewer.timestamp FROM Viewer INNER JOIN Movies ON (Viewer.movieId=Movies.movieId) WHERE userId=?;`;
     let [ratings, fields] = await connection.execute(getRatings, [`${userId}`]);
 
     // render the data
