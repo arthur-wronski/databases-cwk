@@ -4,17 +4,8 @@ html
     title= title
     block stylesheets
       link(rel='stylesheet', href='/stylesheets/style.css')
-  
-  body
+ body
     .dropdown
       h1= title
       .dropdown-content
-        p
-          a(href="/") Home 
-          | 
-          a(href='/films') Films
-          | 
-          a(href='/genres') Genres
-          | 
-          a(href='/predict') Predict Performance
-    p
+        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
