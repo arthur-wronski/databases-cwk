@@ -4,40 +4,24 @@ html
     title= title
     block stylesheets
       link(rel='stylesheet', href='/stylesheets/style.css')
-
   body
     .dropdown
-      h1= movie.title
+      h1= title
       .dropdown-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
-    
 
-    table 
-      thead 
-        td= movie.movieId
-        td= movie.title
-    
     table
       thead
         tr
-          th
-           p: #[a(href='/genres') Genres]
-      tbody
-        each genre in genres 
-          td= genre.name
-    
-    table
-      thead
-        tr
-          th User 
+          th Movie 
           th Rating 
-          th watchDate
+          th Timestamp
       tbody
-        each viewer in viewers
-          tr(class='row-link', data-url=`/userInfo/${viewer.userId}`)
-            td= viewer.userId 
-            td= viewer.rating 
-            td= viewer.watchDate 
+        each rating in ratings
+          tr(class='row-link', data-url=`/filmInfo/${rating.movieId}`)
+            td= rating.title
+            td= rating.rating 
+            td= rating.timestamp
     
     script.
       document.addEventListener('DOMContentLoaded', function() {
