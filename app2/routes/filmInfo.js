@@ -22,9 +22,18 @@ router.get('/:movieId', async function(req, res) {
     const [genres, fieldsG] = await connection.execute(getGenres, [`${movieId}`]);
     
     // select all the users who viewed this movie
-    const getViewers = `SELECT userId, rating, timestamp FROM Viewer WHERE movieId=?;`;
+    const getViewers = `SELECT userId, rating, watchDate FROM Viewer WHERE movieId=?;`;
     const [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`]);
     // can add pages of the viewers same as pages on /films
+
+    viewers.forEach(viewer => {
+      if (viewer.watchDate) {
+        // Converting date to dd/mm/yyyy format
+        const date = new Date(viewer.watchDate);
+        const formattedDate = date.toLocaleDateString('en-GB'); // 'en-GB' uses dd/mm/yyyy format
+        viewer.watchDate = formattedDate;
+      }
+    });
 
     // send output to response frontend
     res.render('filmInfo', { movie: movie, genres: genres, viewers: viewers });

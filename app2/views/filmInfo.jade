@@ -31,13 +31,13 @@ html
         tr
           th User 
           th Rating 
-          th Timestamp
+          th watchDate
       tbody
         each viewer in viewers
           tr(class='row-link', data-url=`/userInfo/${viewer.userId}`)
             td= viewer.userId 
             td= viewer.rating 
-            td= viewer.timestamp 
+            td= viewer.watchDate 
     
     script.
       document.addEventListener('DOMContentLoaded', function() {

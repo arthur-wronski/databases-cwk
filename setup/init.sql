@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS Viewer (
 userId INT,
 movieId INT,
 rating DECIMAL(2,1),
-timestamp BIGINT,
+watchDate DATE,
 PRIMARY KEY (userId, movieId)
 );
 
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS MovieGenres (
     FOREIGN KEY (genreId) REFERENCES Genres(genreId)
 );
 
-LOAD DATA INFILE '/var/lib/mysql-files/ratings.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/cleaned_ratings.csv'
 INTO TABLE Viewer
 FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
@@ -59,5 +59,3 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (movieId, genreId);
-
-SET GLOBAL secure_file_priv='';

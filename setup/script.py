@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime
 
 def preprocess_movies(file_path):
     genres_set = set()
@@ -36,5 +37,19 @@ def preprocess_movies(file_path):
         for movie_id, _, genres in movie_genres:
             for genre in genres:
                 writer.writerow([movie_id, genre_to_id[genre]])
+
+def preprocess_ratings(file_path):
+    with open(file_path, newline='', mode='r', encoding='utf-8') as infile, \
+         open("../data/cleaned_ratings.csv", 'w', newline='', encoding='utf-8') as outfile:
+        reader = csv.DictReader(infile)
+        writer = csv.writer(outfile)
+        writer.writerow(['userId', 'movieId', 'rating', 'date'])
+        for row in reader:
+            timestamp = int(row['timestamp'])
+            date = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d')
+            writer.writerow([row['userId'], row['movieId'], row['rating'], date])
+
+preprocess_movies("../data/movies.csv")
+preprocess_ratings("../data/ratings.csv")
 
 preprocess_movies("../data/movies.csv")
