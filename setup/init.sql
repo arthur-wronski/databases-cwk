@@ -59,5 +59,3 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (movieId, genreId);
-
-SET GLOBAL secure_file_priv='';
