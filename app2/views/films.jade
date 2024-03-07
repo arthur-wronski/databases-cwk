@@ -10,16 +10,16 @@ html
       .dropdown-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
     
-    table 
-      thead
-        each col in allCols
-          th
-            form(action='/films', method='GET')
-              input(type='hidden', name='col', id='col', value=col)
-              input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
-              input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-              input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
-              button(type='submit') #{col}
+    
+    each col in allCols
+      .button_bar
+        form(action='/films', method='GET')
+          input(type='hidden', name='col', id='col', value=col)
+          input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+          input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+          input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
+          button(type='submit') #{col}
+    p
     
     .button_bar
       form(action='/films', method='GET')
