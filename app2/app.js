@@ -27,7 +27,7 @@ app.use(express.static('indexFolder'))
 
 app.use('/', indexRouter);
 app.use('/films', filmRouter);
-app.use('/info', filmInfoRouter);
+app.use('/filmInfo', filmInfoRouter);
 app.use('/genres', genreListRouter);
 app.use('/genreInfo', genreInfoRouter);
 app.use('/userInfo', userInfoRouter);

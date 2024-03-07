@@ -1,0 +1,34 @@
+doctype html
+html
+  head
+    title= title
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+
+    table
+      thead
+        tr
+          th Movie 
+          th Rating 
+          th Timestamp
+      tbody
+        each rating in ratings
+          tr(class='row-link', data-url=`/filmInfo/${rating.movieId}`)
+            td= rating.title
+            td= rating.rating 
+            td= rating.timestamp
+    
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.row-link').forEach(function(element) {
+          element.addEventListener('click', function() {
+            const url = this.dataset.url;
+            window.location.href = url;
+          });
+        });
+      });
