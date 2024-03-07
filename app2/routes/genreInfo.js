@@ -8,43 +8,67 @@ var InputSanitizer = require('./inputsanitizer'); // import sanitizer
 const genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi'];
 const ratings = [4, 3, 1, 2, 5, 4, 3, 5, 4, 4, 4, 3, 5, 1, 1]; // Example ratings for each genre
 
-/* show whole films table */
-router.get('/', async function(req, res) {
-  let connection;
-
-  try {
-    connection = await pool.getConnection();
-    const sqlQuery = 'SELECT * FROM Viewer LIMIT 5;'; // select all
-    const [rows, fields] = await connection.execute(sqlQuery); // pooled connection to db
-    res.render('films', { title: 'Films', data: rows }); // send output to response frontend
-  } catch (err) {
-    console.error('Error from films/:', err);
-    res.render('error', { message: 'from films/', error: err });
-  } finally {
-    if (connection) connection.release();
-  }
-});
-
-/* query-search the table for a subset */
-router.get('/search', async function(req, res) {
+router.get('/:genreId', async function(req, res) {
   let connection;
 
   try {
     connection = await pool.getConnection();
 
     // Sanitize the query parameter
-    let query = InputSanitizer.sanitizeString(req.query.query || '%');
+    let genreId = InputSanitizer.sanitizeString(req.params.genreId || '%');
+    let searchQuery = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
+    let itemNum = parseInt(InputSanitizer.sanitizeString(req.query.itemNum || '0'));
+    if (itemNum < 0) itemNum = 0;
 
-    const sqlQuery = 'SELECT * FROM Viewer WHERE movieId LIKE ?;'; // select subset
-    const [rows, fields] = await connection.execute(sqlQuery, [`%${query}%`]); // pooled connection to db
-    res.render('genreInfo', { title: 'Films', data: rows }); // send output to response frontend
+    // get Genre name
+    const getGenre = `SELECT name FROM Genres WHERE genreId = ? LIMIT 1;`;
+    const [rowsGenre, fieldsG] = await connection.execute(getGenre, [`${genreId}`]);
+    const genre = rowsGenre[0].name; // only one as primary
+
+    const getMovieFields = `SELECT * FROM Movies LIMIT 1;`;
+    const [rows, fieldsM] = await connection.execute(getMovieFields);
+
+    let getMovies = `SELECT Movies.* FROM Movies NATURAL JOIN MovieGenres WHERE Movies.title LIKE ? AND MovieGenres.genreId = ? LIMIT ?,30;`;
+    let [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `${genreId}`, `${itemNum}`]);
+    if (movies.length < 30) itemNum -= 30;
+
+    // set the used columns as selected by the user
+    const shownColQuery = req.query.shownCols;
+    const colQuery = req.query.col;
+    let shownCols;
+    const allCols = fields.map(field => field.name);
+    if (shownColQuery==null) shownCols = allCols;
+    else shownCols = shownColQuery.split(',');
+    if (colQuery!=null) shownCols = add_or_remove(allCols, shownCols, colQuery);
+
+    // render the data
+    res.render('films', { title: genre+' genre', data: movies, allCols: allCols, shownCols: shownCols, searchQuery: searchQuery, itemNum: itemNum});
   } catch (err) {
-    console.error('Error from films/search:', err);
-    res.render('error', { message: 'from films/search', error: err });
+    console.error('Error from genreInfo/', err);
+    res.render('error', { message: 'from genreInfo/', error: err});
   } finally {
     if (connection) connection.release();
   }
-});
+})
+
+function add_or_remove(allEls, shownEls, element){
+  const index = shownEls.indexOf(element);
+  if (allEls.indexOf(element)==-1) return shownEls;
+  if (index == -1){
+    // re-add the element in its original position
+    let newShown = [];
+    for (var i=0; i<allEls.length; i++){
+      if (shownEls.includes(allEls[i]) || allEls[i]==element){
+        newShown.push(allEls[i]);
+      }
+    }
+    return newShown;
+  } else {
+    // remove the element
+    shownEls.splice(index, 1);
+    return shownEls;
+  }
+}
 
 router.get('/movieId-distribution', async function(req, res) {
   try {
