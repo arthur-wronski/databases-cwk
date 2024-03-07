@@ -8,15 +8,25 @@ html
     .dropdown
       h1= title
       .dropdown-content
-        p: #[a(href='/films') Films] #[a(href='/genres') Genres]
+        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+
     table
       thead
         tr
+          th Id 
           th Genre
-          th Average Rating
       tbody
-        each g in data
-          tr
-            td
-              a(href='/genre/' + g.genreId)= g.genre
-            td= g.ratingAv
+        each genre in genres
+          tr(class='row-link', data-url=`/genreInfo/${genre.genreId}`)
+            td= genre.genreId
+            td= genre.name
+    
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.row-link').forEach(function(element) {
+          element.addEventListener('click', function() {
+            const url = this.dataset.url;
+            window.location.href = url;
+          });
+        });
+      });
