@@ -13,10 +13,12 @@ router.get('/', async function(req, res) {
     // Sanitize the query parameter
     let searchQuery = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
     let itemNum = parseInt(InputSanitizer.sanitizeString(req.query.itemNum || '0'));
+    if (itemNum < 0) itemNum = 0;
     
     // only take subset to improve processing
     let search_Movie_Genre = `SELECT * FROM Movies WHERE title LIKE ? LIMIT ?,30;`;
     let [movies, fields] = await connection.execute(search_Movie_Genre, [`%${searchQuery}%`, `${itemNum}`]);
+    if (movies.length < 30) itemNum -= 30;
 
     // set the used columns as selected by the user
     const shownColQuery = req.query.shownCols;

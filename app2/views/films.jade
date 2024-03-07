@@ -53,13 +53,3 @@ html
           tr(class='row-link', data-url=`/films/${row.userId}`)
             each title in shownCols 
               td= row[title]
-
-    script.
-      document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.row-link').forEach(function(element) {
-          element.addEventListener('click', function() {
-            const url = this.dataset.url;
-            window.location.href = url;
-          });
-        });
-      });
