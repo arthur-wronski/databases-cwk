@@ -11,28 +11,12 @@ router.get('/', async function(req, res) {
     connection = await pool.getConnection();
 
     // Sanitize the query parameter
-    let query = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
-    /*
-    // if search resembles a tag, movie results will be ordered by it
-    let related_tag = -1;
-    const search_tag = 'SELECT tagId FROM Tags WHERE tag LIKE ?;';
-    const [tags, fieldT] = await connection.execute(search_tag, [`%${query}%`]);
-    if (tags.length != 0){
-      related_tag = tags[0].tagId;
-    }
-
-    // find films resembling (in title or genre) the query and order by relation to chosen tag (if there is one)
-    let search_Movie_Genre; let movies; let fields;
-    if (related_tag != -1){
-      search_Movie_Genre = `SELECT * FROM Movies WHERE title LIKE ${query} OR genre LIKE ${query};`;
-      [movies, fields] = await connection.execute(search_Movie_Genre);
-    } else {
-      search_Movie_Genre = `SELECT * FROM Movies WHERE title LIKE ${query} OR genre LIKE ${query} ORDER BY tags[?];`;
-      [movies, fields] = await connection.execute(search_Movie_Genre, [`%${related_tag}%`]);
-    }
-    */
-    let search_Movie_Genre = `SELECT * FROM Movies;`;// WHERE title LIKE % OR genre LIKE %;`;
-    let [movies, fields] = await connection.execute(search_Movie_Genre);
+    let searchQuery = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
+    let itemNum = parseInt(InputSanitizer.sanitizeString(req.query.itemNum || '0'));
+    
+    // only take subset to improve processing
+    let search_Movie_Genre = `SELECT * FROM Movies WHERE title LIKE ? LIMIT ?,30;`;
+    let [movies, fields] = await connection.execute(search_Movie_Genre, [`%${searchQuery}%`, `${itemNum}`]);
 
     // set the used columns as selected by the user
     const shownColQuery = req.query.shownCols;
@@ -44,7 +28,7 @@ router.get('/', async function(req, res) {
     if (colQuery!=null) shownCols = add_or_remove(allCols, shownCols, colQuery);
 
     // render the data
-    res.render('films', { title: 'Films', data: movies, allCols: allCols, shownCols: shownCols});
+    res.render('films', { title: 'Films', data: movies, allCols: allCols, shownCols: shownCols, searchQuery: searchQuery, itemNum: itemNum});
   } catch (err) {
     console.error('Error from films/:', err);
     res.render('error', { message: 'from films/', error: err});
@@ -55,6 +39,7 @@ router.get('/', async function(req, res) {
 
 function add_or_remove(allEls, shownEls, element){
   const index = shownEls.indexOf(element);
+  if (allEls.indexOf(element)==-1) return shownEls;
   if (index == -1){
     // re-add the element in its original position
     let newShown = [];

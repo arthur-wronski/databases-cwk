@@ -17,15 +17,31 @@ html
             form(action='/films', method='GET')
               input(type='hidden', name='col', id='col', value=col)
               input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
-              input(type='hidden', name='query', id='query', value='%')
+              input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+              input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
               button(type='submit') #{col}
     
-    form(action='/films', method='GET')
-      label(for='query')
-      input(type='text', name='query', id='query', placeholder='search keywords')
-      input(type='hidden', name='col', id='col', value=col)
-      input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
-      button(type='submit') Search
+    .button_bar
+      form(action='/films', method='GET')
+        label(for='searchQuery')
+        input(type='text', name='searchQuery', id='searchQuery', placeholder='search keywords')
+        input(type='hidden', name='col', id='col', value=col)
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        button(type='submit') Search
+
+    .button_bar
+      form(action='/films', method='GET')
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        button(type='submit') Next Page
+    
+    .button_bar
+      form(action='/films', method='GET')
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        button(type='submit') Previous Page
 
     table
       thead

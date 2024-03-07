@@ -44,7 +44,7 @@ margin-bottom: 5px;
 color: #333;
 }
 
-/* Styles for the Search Bar */
+/* Styles for the Buttons */
 input[type='text'] {
 width: 200px;
 padding: 8px;
@@ -58,6 +58,10 @@ cursor: pointer;
 }
 button:hover {
 background-color: #00bfff;
+}
+.button_bar {
+  display: inline-block;
+  margin-right: 10px;
 }
 
 
