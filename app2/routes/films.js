@@ -16,8 +16,8 @@ router.get('/', async function(req, res) {
     if (itemNum < 0) itemNum = 0;
     
     // only take subset to improve processing
-    let search_Movie_Genre = `SELECT * FROM Movies WHERE title LIKE ? LIMIT ?,30;`;
-    let [movies, fields] = await connection.execute(search_Movie_Genre, [`%${searchQuery}%`, `${itemNum}`]);
+    let getMovies = `SELECT * FROM Movies WHERE title LIKE ? LIMIT ?,30;`;
+    let [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `${itemNum}`]);
     if (movies.length < 30) itemNum -= 30;
 
     // set the used columns as selected by the user
@@ -32,7 +32,7 @@ router.get('/', async function(req, res) {
     // render the data
     res.render('films', { title: 'Films', data: movies, allCols: allCols, shownCols: shownCols, searchQuery: searchQuery, itemNum: itemNum});
   } catch (err) {
-    console.error('Error from films/:', err);
+    console.error('Error from films/', err);
     res.render('error', { message: 'from films/', error: err});
   } finally {
     if (connection) connection.release();

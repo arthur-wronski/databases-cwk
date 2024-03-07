@@ -2,6 +2,7 @@
 var express = require('express');
 var router = express.Router();
 var pool = require('./db');     // retrieve pool from db.js
+var InputSanitizer = require('./inputsanitizer'); // import sanitizer
 
 
 /* show more info about the chosen film */
@@ -10,7 +11,7 @@ router.get('/:movieId', async function(req, res) {
 
   try {
     connection = await pool.getConnection();
-    const movieId = req.params.movieId;
+    const movieId = InputSanitizer.sanitizeString(req.params.movieId || '%');
 
     // select the chosen movie using its primary key
     const getMovie = `SELECT * FROM Movies WHERE movieId = ? LIMIT 1;`;
@@ -38,8 +39,8 @@ router.get('/:movieId', async function(req, res) {
     // send output to response frontend
     res.render('filmInfo', { movie: movie, genres: genres, viewers: viewers });
   } catch (err) {
-    console.error('Error from filmInfo/movieId:', err);
-    res.render('error', { message: 'from filmInfo/movieId', error: err});
+    console.error('Error from filmInfo/', err);
+    res.render('error', { message: 'from filmInfo/', error: err});
   } finally {
     if (connection) connection.release();
   }
