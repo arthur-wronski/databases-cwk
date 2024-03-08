@@ -30,12 +30,47 @@ CREATE TABLE IF NOT EXISTS MovieGenres (
 );
 
 CREATE TABLE IF NOT EXISTS Tags (
+    tagId INT AUTO_INCREMENT,
     userId INT,
     movieId INT,
-    tag VARCHAR(100)
-    PRIMARY KEY (userId, movieId)
-    
+    tag VARCHAR(100),
+    PRIMARY KEY (tagId),
+    INDEX(userId, movieId) 
 );
+
+
+CREATE TABLE IF NOT EXISTS Links (
+    movieId INT,
+    imdbId VARCHAR(10),
+    tmdbId INT,
+    PRIMARY KEY (movieId),
+    FOREIGN KEY (movieId) REFERENCES Movies(movieId)
+);
+
+CREATE TABLE IF NOT EXISTS Crew (
+    tmdbId INT,
+    title VARCHAR(255),
+    Director VARCHAR(100),
+    TopTwoActors TEXT,
+    release_date DATE,
+    PRIMARY KEY (tmdbId),
+    FOREIGN KEY (tmdbId) REFERENCES MovieLinks(tmdbId)
+);
+
+LOAD DATA INFILE '/var/lib/mysql-files/crew.csv'
+INTO TABLE Crew
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(tmdbId, title, Director, TopTwoActors, release_date);
+
+LOAD DATA INFILE '/var/lib/mysql-files/cleaned_links.csv'
+INTO TABLE Links
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(movieId, imdbId, tmdbId);
 
 LOAD DATA INFILE '/var/lib/mysql-files/cleaned_ratings.csv'
 INTO TABLE Viewer
@@ -74,4 +109,4 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
-(userId, movieId, tag);
+(userId, movieId, tag, @dummy);

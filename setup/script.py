@@ -49,7 +49,17 @@ def preprocess_ratings(file_path):
             date = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d')
             writer.writerow([row['userId'], row['movieId'], row['rating'], date])
 
-preprocess_movies("../data/movies.csv")
-preprocess_ratings("../data/ratings.csv")
+def preprocess_links(file_path):
+    with open(file_path, newline='', mode='r', encoding='utf-8') as infile, \
+         open("../data/cleaned_links.csv", 'w', newline='', encoding='utf-8') as outfile:
+        reader = csv.DictReader(infile)
+        writer = csv.writer(outfile)
+        writer.writerow(['movieId', 'imdbId', 'tmdbId'])
+        for row in reader:
+            if row['tmdbId']: 
+                writer.writerow([row['movieId'], row['imdbId'], row['tmdbId']])
+
 
 preprocess_movies("../data/movies.csv")
+preprocess_ratings("../data/ratings.csv")
+preprocess_links("../data/links.csv")
