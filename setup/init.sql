@@ -29,6 +29,14 @@ CREATE TABLE IF NOT EXISTS MovieGenres (
     FOREIGN KEY (genreId) REFERENCES Genres(genreId)
 );
 
+CREATE TABLE IF NOT EXISTS Tags (
+    userId INT,
+    movieId INT,
+    tag VARCHAR(100)
+    PRIMARY KEY (userId, movieId)
+    
+);
+
 LOAD DATA INFILE '/var/lib/mysql-files/cleaned_ratings.csv'
 INTO TABLE Viewer
 FIELDS TERMINATED BY ','
@@ -59,3 +67,11 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES
 (movieId, genreId);
+
+LOAD DATA INFILE '/var/lib/mysql-files/tags.csv'
+INTO TABLE Tags
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS
+(userId, movieId, tag);
