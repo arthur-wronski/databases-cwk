@@ -67,6 +67,35 @@ html
             x: {
               title: { text: 'Rating ?/5', display: true}
             }
+          },
+          plugins: {
+            legend: {
+              onClick: (click, legendItem, legend) => {
+                const index = genreNames.indexOf(legendItem.text);
+                legend.chart.data.datasets[index].hidden = !legend.chart.data.datasets[index].hidden;
+                legend.chart.update();
+              },
+              labels: {
+                generateLabels: (chart) => {
+                  let visibility = [];
+                  for (var i=0; i<chart.data.datasets.length; i++) {
+                    if (chart.data.datasets[i].hidden) {
+                      visibility.push('rgba(100,100,100,0.5)');
+                    } else {
+                      visibility.push('rgba(100,100,100,1)');
+                    }
+                  };
+                  return chart.data.datasets.map(
+                    (data, index) => ({
+                      text: data.label,
+                      fillStyle: data.backgroundColor,
+                      strokeStyle: data.backgroundColor,
+                      fontColor: visibility[index]
+                    })
+                  )
+                }
+              }
+            }
           }
         }
       });
