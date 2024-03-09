@@ -20,7 +20,6 @@ html
           input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
           button(type='submit') #{col}
     p
-    
     .button_bar
       form(action=route, method='GET')
         label(for='searchQuery')
@@ -33,15 +32,15 @@ html
       form(action=route, method='GET')
         input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
         input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
-        button(type='submit') Next Page
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        button(type='submit') Previous Page
     
     .button_bar
       form(action=route, method='GET')
         input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
         input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
-        button(type='submit') Previous Page
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        button(type='submit') Next Page
 
     table
       thead
@@ -53,6 +52,21 @@ html
           tr(class='row-link', data-url=`/filmInfo/${row.movieId}`)
             each title in shownCols 
               td= row[title]
+
+    p
+    .button_bar
+      form(action=route, method='GET')
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        button(type='submit') Previous Page
+    
+    .button_bar
+      form(action=route, method='GET')
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        button(type='submit') Next Page
     
     script.
       document.addEventListener('DOMContentLoaded', function() {
