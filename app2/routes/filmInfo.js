@@ -27,6 +27,14 @@ router.get('/:movieId', async function(req, res) {
     const [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`]);
     // can add pages of the viewers same as pages on /films
 
+    let ratingFrequencies = [0,0,0,0,0,0,0,0,0,0];
+    let rating = 0;
+    for (var i=0; i<viewers.length; i++){
+      rating += viewers[i].rating / viewers.length;
+      ratingFrequencies[parseInt(viewers[i].rating * 2.0)-1] += 1;
+    }
+    rating = rating.toPrecision(3);
+
     viewers.forEach(viewer => {
       if (viewer.watchDate) {
         // Converting date to dd/mm/yyyy format
@@ -37,7 +45,7 @@ router.get('/:movieId', async function(req, res) {
     });
 
     // send output to response frontend
-    res.render('filmInfo', { movie: movie, genres: genres, viewers: viewers });
+    res.render('filmInfo', { movie: movie, genres: genres, viewers: viewers, rating: rating, ratingFrequencies: ratingFrequencies });
   } catch (err) {
     console.error('Error from filmInfo/', err);
     res.render('error', { message: 'from filmInfo/', error: err});
