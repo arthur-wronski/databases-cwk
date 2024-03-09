@@ -4,6 +4,7 @@ html
     title= title
     block stylesheets
       link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src='https://cdn.jsdelivr.net/npm/chart.js')
   body
     .dropdown
       h1= title
@@ -15,12 +16,16 @@ html
         tr
           th Id 
           th Genre
+          th Average Rating
       tbody
         each genre in genres
           tr(class='row-link', data-url=`/genreInfo/${genre.genreId}`)
             td= genre.genreId
             td= genre.name
+            td= genreAverages[genre.genreId-1]
     
+    canvas#genresChart(width='800', height='400')
+
     script.
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.row-link').forEach(function(element) {
@@ -29,4 +34,39 @@ html
             window.location.href = url;
           });
         });
+      });
+    
+    script.
+      genreNamesJSON = '#{JSON.stringify(genreNames)}';
+      genreNames = genreNamesJSON.slice(7,genreNamesJSON.length-7).split('&quot;,&quot;');
+      genreRatings = '#{genreRatings}'.split(',X,').map(arr => arr.split(','));
+      let dataset = [];
+      for (var i=0; i<genreRatings.length; i++) {
+        dataset.push({
+          label: genreNames[i],
+          data: genreRatings[i],
+          borderWidth: 1,
+          hidden: true
+        });
+      }
+      
+      const ctx = document.getElementById('genresChart');
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'],
+          datasets: dataset
+        },
+        options: {
+          scales: {
+            y: {
+              title: { text:'Frequency', display: true },
+              beginAtZero: true
+            },
+            x: {
+              title: { text: 'Rating ?/5', display: true}
+            }
+          }
+        }
       });
