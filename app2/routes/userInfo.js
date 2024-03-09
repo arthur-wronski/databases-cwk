@@ -64,8 +64,11 @@ router.get('/:userId', async function(req, res) {
     }  
     
     // Render the genre data for comparisons
-    res.render('userInfo', { id: userId, ratings: ratings, searchQuery: searchQuery, itemNum: itemNum });
-    //res.render('genres', { title: 'Genres', genres: genres, genreNames: genreNames, genreRatings: genreRatings, genreAverages: genreAverages });
+    //res.render('userInfo', { id: userId, ratings: ratings, searchQuery: searchQuery, itemNum: itemNum });
+    res.render('userInfo', { 
+      id: userId,
+      searchQuery: searchQuery, itemNum: itemNum, 
+      ratings: ratings, genreNames: genreNames, genreRatings: genreRatings });
   } catch (err) {
     console.error('Error from userInfo/', err);
     res.render('error', { message: 'Error in userInfo', error: err });
