@@ -30,7 +30,7 @@ router.get('/', async function(req, res) {
     if (colQuery!=null) shownCols = add_or_remove(allCols, shownCols, colQuery);
 
     // render the data
-    res.render('films', { title: 'Films', data: movies, allCols: allCols, shownCols: shownCols, searchQuery: searchQuery, itemNum: itemNum});
+    res.render('films', { title: 'Films', data: movies, allCols: allCols, shownCols: shownCols, searchQuery: searchQuery, itemNum: itemNum, route: '/films' });
   } catch (err) {
     console.error('Error from films/', err);
     res.render('error', { message: 'from films/', error: err});
