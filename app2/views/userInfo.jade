@@ -1,32 +1,33 @@
 doctype html
 html
   head
-    title= title
+    title UserInfo
     block stylesheets
       link(rel='stylesheet', href='/stylesheets/style.css')
   body
     .dropdown
-      h1= title
+      h1 User: #{id}
       .dropdown-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+    
+    
+    .button_bar
+      form(action='/userInfo/'+id, method='GET')
+        label(for='searchQuery')
+        input(type='text', name='searchQuery', id='searchQuery', placeholder='search keywords')
+        button(type='submit') Search
 
-  .button_bar
-    form(action='/userInfo/' + userId, method='GET')
-      label(for='searchQuery') Search Movies:
-      input(type='text', name='searchQuery', id='searchQuery', placeholder='Enter movie title...')
-      button(type='submit') Search
-
-
-  .button_bar
-    form(action='/userInfo/' + userId + '?searchQuery=' + searchQuery, method='GET')
-      input(type='hidden', name='itemNum', value='#{itemNum + 30}')
-      button(type='submit') Next Page
-
-  .button_bar
-    form(action='/userInfo/' + userId + '?searchQuery=' + searchQuery, method='GET')
-      input(type='hidden', name='itemNum', value='#{Math.max(0, itemNum - 30)}')
-      button(type='submit') Previous Page
-
+    .button_bar
+      form(action='/userInfo/'+id, method='GET')
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-10)
+        button(type='submit') Previous Page
+    
+    .button_bar
+      form(action='/userInfo/'+id, method='GET')
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+10)
+        button(type='submit') Next Page
 
     table
       thead
@@ -37,7 +38,7 @@ html
       tbody
         each rating in ratings
           tr(class='row-link', data-url=`/filmInfo/${rating.movieId}`)
-            td= rating.title
+            td= rating.title 
             td= rating.rating 
             td= rating.watchDate
     

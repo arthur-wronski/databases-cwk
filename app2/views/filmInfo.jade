@@ -47,6 +47,16 @@ html
             td= viewer.watchDate 
     
     script.
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.row-link').forEach(function(element) {
+          element.addEventListener('click', function() {
+            const url = this.dataset.url;
+            window.location.href = url;
+          });
+        });
+      });
+    
+    script.
       ratingFrequencies = '#{ratingFrequencies}'.split(',');
       let dataset = [];
       for (var i=0; i<1; i++) {

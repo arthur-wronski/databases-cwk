@@ -10,7 +10,6 @@ router.get('/', async function(req, res) {
   try {
     connection = await pool.getConnection();
 
-    // Sanitize the query parameter
     let searchQuery = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
     let itemNum = parseInt(InputSanitizer.sanitizeString(req.query.itemNum || '0'));
     if (itemNum < 0) itemNum = 0;
