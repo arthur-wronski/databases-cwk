@@ -10,6 +10,24 @@ html
       .dropdown-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
 
+  .button_bar
+    form(action='/userInfo/' + userId, method='GET')
+      label(for='searchQuery') Search Movies:
+      input(type='text', name='searchQuery', id='searchQuery', placeholder='Enter movie title...')
+      button(type='submit') Search
+
+
+  .button_bar
+    form(action='/userInfo/' + userId + '?searchQuery=' + searchQuery, method='GET')
+      input(type='hidden', name='itemNum', value='#{itemNum + 30}')
+      button(type='submit') Next Page
+
+  .button_bar
+    form(action='/userInfo/' + userId + '?searchQuery=' + searchQuery, method='GET')
+      input(type='hidden', name='itemNum', value='#{Math.max(0, itemNum - 30)}')
+      button(type='submit') Previous Page
+
+
     table
       thead
         tr

@@ -10,31 +10,37 @@ router.get('/:userId', async function(req, res) {
   try {
     connection = await pool.getConnection();
 
-    // Sanitize the query parameter
-    let userId = InputSanitizer.sanitizeString(req.params.userId || '%');
-    
-    // only take subset to improve processing
-    let getRatings = `SELECT Viewer.movieId, Movies.title, Viewer.rating, Viewer.watchDate FROM Viewer INNER JOIN Movies ON (Viewer.movieId=Movies.movieId) WHERE userId=?;`;
-    let [ratings, fields] = await connection.execute(getRatings, [`${userId}`]);
+    let searchQuery = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
+    let userId = InputSanitizer.sanitizeString(req.params.userId);
+
+    let itemNum = parseInt(req.query.itemNum || '0', 10);
+    if (itemNum < 0) itemNum = 0;
+
+    let getRatings = `
+      SELECT Viewer.movieId, Movies.title, Viewer.rating, Viewer.watchDate 
+      FROM Viewer 
+      INNER JOIN Movies ON Viewer.movieId=Movies.movieId 
+      WHERE Viewer.userId = ? AND Movies.title LIKE ? 
+      LIMIT ?, 30;
+    `;
+
+    let [ratings] = await connection.execute(getRatings, [`%${userId}%`, `%${searchQuery}%`, `%${itemNum}%`]);
 
     ratings.forEach(rating => {
       if (rating.watchDate) {
-        // Converting date to dd/mm/yyyy format
         const date = new Date(rating.watchDate);
-        const formattedDate = date.toLocaleDateString('en-GB'); // 'en-GB' uses dd/mm/yyyy format
+        const formattedDate = date.toLocaleDateString('en-GB');
         rating.watchDate = formattedDate;
       }
     });
 
-    // render the data
-    res.render('userInfo', { title: 'User '+userId, ratings: ratings });
+    res.render('userInfo', { title: 'User ' + userId, userId: userId, ratings: ratings, searchQuery: searchQuery, itemNum: itemNum });
   } catch (err) {
     console.error('Error from userInfo/', err);
-    res.render('error', { message: 'from userInfo/', error: err});
+    res.render('error', { message: 'Error in userInfo', error: err });
   } finally {
     if (connection) connection.release();
   }
-})
-
+});
 
 module.exports = router;
