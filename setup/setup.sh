@@ -25,7 +25,7 @@ docker cp ../data/. mysql_container:/var/lib/mysql-files/
 
 # Execute SQL scripts to initialize the database
 echo "Executing SQL scripts..."
-docker exec -i mysql_container mysql -u root -pyour_root_password -v < init.sql
+docker exec -i mysql_container mysql -u root -pyour_root_password < init.sql
 
 
 # Building and running the Docker container for app2
