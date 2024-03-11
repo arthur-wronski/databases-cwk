@@ -1,6 +1,11 @@
 CREATE DATABASE IF NOT EXISTS MovieLens;
 USE MovieLens;
 
+CREATE TABLE IF NOT EXISTS Movies (
+    movieId INT PRIMARY KEY,
+    title VARCHAR(255)
+);
+
 CREATE TABLE IF NOT EXISTS Viewer (
     userId INT,
     movieId INT,
@@ -8,11 +13,6 @@ CREATE TABLE IF NOT EXISTS Viewer (
     watchDate DATE,
     PRIMARY KEY (userId, movieId),
     FOREIGN KEY (movieId) REFERENCES Movies(movieId)
-);
-
-CREATE TABLE IF NOT EXISTS Movies (
-    movieId INT PRIMARY KEY,
-    title VARCHAR(255)
 );
 
 CREATE TABLE IF NOT EXISTS Genres (
@@ -45,14 +45,13 @@ CREATE TABLE IF NOT EXISTS Crew (
     FOREIGN KEY (movieId) REFERENCES Movies(movieId)
 );
 
-LOAD DATA INFILE '/var/lib/mysql-files/cleaned_crew.csv'
-INTO TABLE Crew
+LOAD DATA INFILE '/var/lib/mysql-files/cleaned_movies.csv'
+INTO TABLE Movies
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS
-(movieId, Director, TopTwoActors, @releaseDate);
-
+LINES TERMINATED BY '\r\n'
+IGNORE 1 LINES
+(movieId, title);
 
 LOAD DATA INFILE '/var/lib/mysql-files/cleaned_ratings.csv'
 INTO TABLE Viewer
@@ -61,13 +60,7 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE '/var/lib/mysql-files/cleaned_movies.csv'
-INTO TABLE Movies
-FIELDS TERMINATED BY ','
-OPTIONALLY ENCLOSED BY '"'
-LINES TERMINATED BY '\r\n'
-IGNORE 1 LINES
-(movieId, title);
+
 
 LOAD DATA INFILE '/var/lib/mysql-files/genres.csv'
 INTO TABLE Genres
@@ -92,3 +85,13 @@ ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS
 (userId, movieId, tag, @dummy);
+
+LOAD DATA INFILE '/var/lib/mysql-files/cleaned_crew.csv'
+INTO TABLE Crew
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+
+
