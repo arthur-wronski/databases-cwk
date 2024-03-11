@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 # Step 1: Run Python script to preprocess data and generate CSV files
 echo "Running Python preprocessing script..."
-python script.py
+python cleaning.py
 
 # Step 2: Start Docker containers using docker-compose
 echo "Starting Docker containers..."
