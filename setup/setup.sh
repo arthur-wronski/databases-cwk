@@ -1,32 +1,44 @@
 #!/bin/bash
 echo "Starting script..."
 
-# Navigate to the script's directory
+# Ensure this script is run from its containing directory
 cd "$(dirname "$0")"
 
-# Step 1: Run Python script to preprocess data and generate CSV files
+# Preprocess data
 echo "Running Python preprocessing script..."
 python cleaning.py
 
-# Step 2: Start Docker containers using docker-compose
+# Start the Docker environment
 echo "Starting Docker containers..."
 docker-compose up -d
 
-# Wait for MySQL to be ready
+# Ensure MySQL is fully up and running
 echo "Waiting for MySQL to be ready..."
-while ! docker exec mysql_container mysqladmin --user=root --password=your_root_password --host "127.0.0.1" ping --silent &> /dev/null ; do
+while ! docker exec mysql_container mysqladmin --user=root --password=your_root_password ping --silent &> /dev/null ; do
     echo "Waiting for database connection..."
     sleep 2
 done
 
-# Step 3: Copy the generated CSV files into the MySQL container
+# Copy preprocessed CSV files into the MySQL container
 echo "Copying CSV files into the MySQL container..."
 docker cp ../data/. mysql_container:/var/lib/mysql-files/
 
-# Step 4: Execute SQL scripts
+# Execute SQL scripts to initialize the database
 echo "Executing SQL scripts..."
-#docker exec -i mysql_container mysql -u root -p your_root_password MovieLens < init.sql
-docker exec mysql_container mysql -u root -pyour_root_password MovieLens < init.sql
+docker exec mysql_container mysql -u root -pyour_root_password < init.sql
 
+# Building and running the Docker container for app2
+echo "Building and running Docker container for app2..."
+cd ../app2
+docker build -t db-app .
+docker run -p 3000:3000 -d --name app-cont db-app
 
-echo "Data import and SQL script execution completed."
+# Connect the app2 container to the specified network
+echo "Connecting app-cont to the network..."
+docker network connect network app-cont
+
+# Assuming you want to connect the MySQL container to the same network
+echo "Connecting mysql_container to the network..."
+docker network connect network mysql_container
+
+echo "Setup completed."
