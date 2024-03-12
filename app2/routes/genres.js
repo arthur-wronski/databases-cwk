@@ -12,14 +12,20 @@ router.get('/', async function(req, res) {
     connection = await pool.getConnection();
 
     // get list of genres
-    const getGenres = 'SELECT * FROM Genres ORDER BY genreId;';
+    const getGenres = `
+      SELECT * 
+      FROM Genres 
+      ORDER BY genreId;`;
     const [genres, fieldsG] = await connection.execute(getGenres);
 
     // get the graph data of the genres to compare
     const genreNames = [];
     const genreRatings = [];
     const genreAverages = [];
-    const getReviews = `SELECT Viewer.rating, MovieGenres.genreId FROM Viewer NATURAL JOIN MovieGenres;`;
+    const getReviews = `
+      SELECT Viewer.rating, MovieGenres.genreId 
+      FROM Viewer NATURAL JOIN MovieGenres;
+    `;
     const [ratings, fieldsR] = await connection.execute(getReviews);
     // get ratings of all films in these genres
     for (var i=0; i<genres.length; i++){

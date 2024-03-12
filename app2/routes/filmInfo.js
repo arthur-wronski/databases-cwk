@@ -14,7 +14,12 @@ router.get('/:movieId', async function(req, res) {
     const movieId = InputSanitizer.sanitizeString(req.params.movieId || '%');
 
     // select the chosen movie using its primary key
-    const getMovie = `SELECT * FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId WHERE Movies.movieId = ? LIMIT 1;`;
+    const getMovie = `
+      SELECT * 
+      FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId 
+      WHERE Movies.movieId = ? 
+      LIMIT 1;
+    `;
     const [rowsMovie, fieldsM] = await connection.execute(getMovie, [`${movieId}`]);
     const movie = rowsMovie[0]; // only one as primary
 
@@ -25,14 +30,21 @@ router.get('/:movieId', async function(req, res) {
     }
 
     // select the genres of this movie
-    const getGenres = `SELECT Genres.genreId, Genres.name FROM Genres INNER JOIN MovieGenres ON (MovieGenres.genreId=Genres.genreId) WHERE MovieGenres.movieId=?;`;
+    const getGenres = `
+      SELECT Genres.genreId, Genres.name 
+      FROM Genres INNER JOIN MovieGenres ON MovieGenres.genreId=Genres.genreId
+      WHERE MovieGenres.movieId=?;
+    `;
     const [genres, fieldsG] = await connection.execute(getGenres, [`${movieId}`]);
     
     // select all the users who viewed this movie
     let itemNum = parseInt(InputSanitizer.sanitizeString(req.query.itemNum || '0'));
     if (itemNum < 0) itemNum = 0;
-    // only take subset to improve processing
-    const getViewers = `SELECT userId, rating, watchDate FROM Viewer WHERE movieId=? LIMIT ?,30;`;
+    const getViewers = `
+      SELECT userId, rating, watchDate 
+      FROM Viewer WHERE movieId=? 
+      LIMIT ?,30;
+    `;
     const [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`, `${itemNum}`]);
     if (viewers.length < 30) itemNum -= 30;
 

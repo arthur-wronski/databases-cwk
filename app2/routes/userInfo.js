@@ -10,7 +10,7 @@ router.get('/:userId', async function(req, res) {
   try {
     connection = await pool.getConnection();
 
-    let userId = InputSanitizer.sanitizeString(req.params.userId);
+    let userId = parseInt(InputSanitizer.sanitizeString(req.params.userId || '1'));
 
     let searchQuery = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
     let itemNum = parseInt(InputSanitizer.sanitizeString(req.query.itemNum || '0'));
@@ -24,7 +24,7 @@ router.get('/:userId', async function(req, res) {
     `;
     let [ratings,fieldsR] = await connection.execute(getRatings, [`${userId}`, `%${searchQuery}%`, `${itemNum}`]);
     if (ratings.length < 10) itemNum -= 10;
-
+    
     ratings.forEach(rating => {
       if (rating.watchDate) {
         const date = new Date(rating.watchDate);
@@ -34,13 +34,21 @@ router.get('/:userId', async function(req, res) {
     });
 
     // get list of genres
-    const getGenres = 'SELECT * FROM Genres ORDER BY genreId;';
+    const getGenres = `
+      SELECT * 
+      FROM Genres 
+      ORDER BY genreId;
+    `;
     const [genres, fieldsG] = await connection.execute(getGenres);
     // get the graph data of the genres to compare
     const genreNames = [];
     const genreRatings = [];
     const genreAverages = [];
-    const getRatings_Genre = `SELECT Viewer.rating, MovieGenres.genreId FROM Viewer NATURAL JOIN MovieGenres WHERE Viewer.userId=?;`;
+    const getRatings_Genre = `
+      SELECT Viewer.rating, MovieGenres.genreId 
+      FROM Viewer NATURAL JOIN MovieGenres 
+      WHERE Viewer.userId=?;
+    `;
     const [ratings_genre, fieldsRG] = await connection.execute(getRatings_Genre, [`${userId}`]);
     // get ratings of all films in these genres
     for (var i=0; i<genres.length; i++){
