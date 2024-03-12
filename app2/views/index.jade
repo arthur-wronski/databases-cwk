@@ -9,3 +9,27 @@ html
       h1= title
       .dropdown-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+    
+  
+    p This platform provides an interactive web interface for exploring and analyzing the MovieLens dataset, which includes information on all the movies contained in the dataset. The project utilizes a Python script for data cleaning and preparation, ensuring compatibility with SQL databases and handling cases with missing information. We are using Docker containers to host both the frontend and the database backend, as well as making deployment straightforward and automated through a bash script.
+
+    p  ## Features
+
+    p  The website is divided into three main sections:
+
+    p  ### Movies
+
+    p  - **Overview**: Displays a paginated list of movies, including title, crew information, and release date. Each page shows 30 movies.
+    p  - **Customization**: Users can toggle the visibility of columns to customize the display of movie information.
+    p  - **Detailed View**: Clicking on a movie reveals additional details, such as the `movieId`, average rating, genres, and a distribution graph of its ratings. All ratings are displayed, including user ID, rating, and rating date.
+
+    p  ### Genres
+
+    p  - **Overview**: Shows all genres available in the database along with their average ratings.
+    p  - **Analytics**: Features a graph displaying the frequency of movies per genre and their rating distribution. Users can filter the graph by toggling genres on and off.
+    p  - **Detailed View**: Selecting a genre displays a list of movies belonging to that genre, similar to the Movies tab, allowing for in-depth exploration of genre-specific content.
+
+    p  ### Predict Performance
+
+    p  - **Functionality**: This feature calculates and predicts a movie's expected rating based on the tags associated with it and its preview ratings.
+
