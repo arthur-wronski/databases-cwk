@@ -63,8 +63,6 @@ router.get('/:userId', async function(req, res) {
       genreAverages[i] = (genreAverages[i] / (total_ratings*2)).toPrecision(3);
     }  
     
-    // Render the genre data for comparisons
-    //res.render('userInfo', { id: userId, ratings: ratings, searchQuery: searchQuery, itemNum: itemNum });
     res.render('userInfo', { 
       id: userId,
       searchQuery: searchQuery, itemNum: itemNum, 

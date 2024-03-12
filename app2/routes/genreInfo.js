@@ -35,7 +35,7 @@ router.get('/:genreId', async function(req, res) {
     if (colQuery!=null) shownCols = add_or_remove(allCols, shownCols, colQuery);
 
     // render the data
-    res.render('films', { title: genre+' genre', data: movies, allCols: allCols, shownCols: shownCols, searchQuery: searchQuery, itemNum: itemNum, route: '/genreInfo/'+genreId });
+    res.render('films', { title: genre, data: movies, allCols: allCols, shownCols: shownCols, searchQuery: searchQuery, itemNum: itemNum, route: '/genreInfo/'+genreId });
   } catch (err) {
     console.error('Error from genreInfo/', err);
     res.render('error', { message: 'from genreInfo/', error: err});

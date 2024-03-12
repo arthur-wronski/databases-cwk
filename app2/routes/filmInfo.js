@@ -23,9 +23,12 @@ router.get('/:movieId', async function(req, res) {
     const [genres, fieldsG] = await connection.execute(getGenres, [`${movieId}`]);
     
     // select all the users who viewed this movie
-    const getViewers = `SELECT userId, rating, watchDate FROM Viewer WHERE movieId=?;`;
-    const [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`]);
-    // can add pages of the viewers same as pages on /films
+    let itemNum = parseInt(InputSanitizer.sanitizeString(req.query.itemNum || '0'));
+    if (itemNum < 0) itemNum = 0;
+    // only take subset to improve processing
+    const getViewers = `SELECT userId, rating, watchDate FROM Viewer WHERE movieId=? LIMIT ?,30;`;
+    const [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`, `${itemNum}`]);
+    if (viewers.length < 30) itemNum -= 30;
 
     let ratingFrequencies = [0,0,0,0,0,0,0,0,0,0];
     let rating = 0;
@@ -45,7 +48,7 @@ router.get('/:movieId', async function(req, res) {
     });
 
     // send output to response frontend
-    res.render('filmInfo', { movie: movie, genres: genres, viewers: viewers, rating: rating, ratingFrequencies: ratingFrequencies });
+    res.render('filmInfo', { movie: movie, genres: genres, viewers: viewers, rating: rating, ratingFrequencies: ratingFrequencies, itemNum: itemNum });
   } catch (err) {
     console.error('Error from filmInfo/', err);
     res.render('error', { message: 'from filmInfo/', error: err});
