@@ -26,9 +26,3 @@ The website is divided into three main sections:
 
 - **Data Preparation**: cd into app2/setup, run: "chmod +x setup.sh" to compile the script, run the bash script using: "./setup.sh", it will clean the data, set up the docker containers and import the data into an SQL database. Everything will be ready to view at http://localhost:3000
 
-We welcome contributions! Please feel free to submit pull requests or open issues to discuss proposed changes or report bugs.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
