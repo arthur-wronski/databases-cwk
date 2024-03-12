@@ -8,23 +8,77 @@ html
     .dropdown
       h1= title
       .dropdown-content
-        p: #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
-    p Tags: #{tags}
-    p Predicted Rating by Tag: #{tagRate}
-    p Predicted Rating by Previews: #{previewRate}
+        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
 
-    form(action='/predict/add_tag', method='GET')
-      label(for='next_tag')
-      input(type='text', name='next_tag', id='next_tag', placeholder='add tag')
-      button(type='submit') Tags
-      input(type='hidden', name='tags', value="<%= tags %>")
-      input(type='hidden', name='tagRate', value="<%= tagRate %>")
-      input(type='hidden', name='previewRate', value="<%= previewRate %>")
+    .button_bar
+      form(action="/predict", method="get")
+        input(type="text", name="searchQuery", placeholder="Search tags...", value=searchQuery)
+        button(type="submit") Search
 
-    form(action='/predict/add_review', method='GET')
-      label(for='next_review')
-      input(type='number', name='next_review', id='next_review', placeholder='add review')
-      button(type='submit')
-      input(type='hidden', name='tags', value="<%= tags %>")
-      input(type='hidden', name='tagRate', value="<%= tagRate %>")
-      input(type='hidden', name='previewRate', value="<%= previewRate %>")
+    .button_bar
+      form(action='/predict', method='GET')
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        button(type='submit') Previous Page
+    
+    .button_bar
+      form(action='/predict', method='GET')
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        button(type='submit') Next Page
+    
+
+    h2 Selected Tags
+    ul#selectedTagsList
+
+    h2 Average Rating: #{tagAverages}
+ 
+
+    table
+      thead
+        tr
+          th Tag ID
+          th User ID
+      tbody
+        each tag in tags
+          tr(data-tag-id=tag.tagId onclick="toggleTagSelection(this)")
+            td= tag.tagId
+            td= tag.userId 
+
+
+
+    .button_bar
+      form(action='/predict', method='GET')
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        button(type='submit') Previous Page
+    
+    .button_bar
+      form(action='/predict', method='GET')
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        button(type='submit') Next Page
+
+    script.
+      var selectedTags = [];
+
+      function toggleTagSelection(row) {
+        var tagId = row.getAttribute('data-tag-id');
+        var index = selectedTags.indexOf(tagId);
+        if (index === -1) {
+          selectedTags.push(tagId);
+        } else {
+          selectedTags.splice(index, 1);
+        }
+        updateSelectedTagsDisplay();
+      }
+
+      function updateSelectedTagsDisplay() {
+        var listElement = document.getElementById('selectedTagsList');
+        listElement.innerHTML = '';
+        selectedTags.forEach(function(tagId) {
+          var listItem = document.createElement('li');
+          listItem.textContent = 'Tag ID: ' + tagId;
+          listElement.appendChild(listItem);
+        });
+      }
