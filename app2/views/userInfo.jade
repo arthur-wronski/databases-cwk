@@ -1,0 +1,149 @@
+doctype html
+html
+  head
+    title UserInfo
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src='https://cdn.jsdelivr.net/npm/chart.js')
+  body
+    .dropdown
+      h1 User: #{id}
+      .dropdown-content
+        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+    
+    .button_bar
+      form(action='/userInfo/'+id, method='GET')
+        label(for='searchQuery')
+        input(type='text', name='searchQuery', id='searchQuery', placeholder='search keywords')
+        button(type='submit') Search
+
+    .button_bar
+      form(action='/userInfo/'+id, method='GET')
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-10)
+        button(type='submit') Previous Page
+    
+    .button_bar
+      form(action='/userInfo/'+id, method='GET')
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+10)
+        button(type='submit') Next Page
+
+    table
+      thead
+        tr
+          th Movie 
+          th Rating 
+          th Date
+      tbody
+        each rating in ratings
+          tr(class='row-link', data-url=`/filmInfo/${rating.movieId}`)
+            td= rating.title 
+            td= rating.rating 
+            td= rating.watchDate
+    
+    canvas#genresChart(width='600', height='200',style="margin-left:30px; margin-right: 70px;")
+
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.row-link').forEach(function(element) {
+          element.addEventListener('click', function() {
+            const url = this.dataset.url;
+            window.location.href = url;
+          });
+        });
+      });
+    
+    script.
+      const ctx = document.getElementById('genresChart');
+      let chart;
+
+      function allOn() {
+        chart.data.datasets.forEach(function(dataset) {
+          dataset.hidden = false;
+        });
+        chart.update();
+      }
+      function allOff() {
+        chart.data.datasets.forEach(function(dataset) {
+          dataset.hidden = true;
+        });
+        chart.update();
+      }
+
+      genreNamesJSON = '#{JSON.stringify(genreNames)}';
+      genreNames = genreNamesJSON.slice(7,genreNamesJSON.length-7).split('&quot;,&quot;');
+      genreRatings = '#{genreRatings}'.split(',X,').map(arr => arr.split(','));
+      let dataset = [];
+      for (var i=0; i<genreRatings.length; i++) {
+        dataset.push({
+          label: genreNames[i],
+          data: genreRatings[i],
+          borderWidth: 1,
+          hidden: true
+        });
+      }
+
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'],
+          datasets: dataset
+        },
+        options: {
+          scales: {
+            y: {
+              title: { text:'Frequency', display: true },
+              beginAtZero: true
+            },
+            x: {
+              title: { text: 'Rating ?/5', display: true}
+            }
+          },
+          plugins: {
+            legend: {
+              onClick: (click, legendItem, legend) => {
+                const index = genreNames.indexOf(legendItem.text);
+                if (index==-1){
+                  if (legendItem.text=='Select All') allOn();
+                  if (legendItem.text=='Unselect All') allOff();
+                } else {
+                  legend.chart.data.datasets[index].hidden = !legend.chart.data.datasets[index].hidden;
+                }
+                legend.chart.update();
+              },
+              labels: {
+                generateLabels: (chart) => {
+                  let visibility = [];
+                  for (var i=0; i<chart.data.datasets.length; i++) {
+                    if (chart.data.datasets[i].hidden) {
+                      visibility.push('rgba(100,100,100,0.5)');
+                    } else {
+                      visibility.push('rgba(100,100,100,1)');
+                    }
+                  };
+                  let new_labels = chart.data.datasets.map((data, index) => ({
+                      text: data.label,
+                      fillStyle: data.backgroundColor,
+                      strokeStyle: data.backgroundColor,
+                      fontColor: visibility[index]
+                  }));
+                  new_labels.push({
+                    text: 'Select All',
+                    fillStyle: 'rgba(255,255,255,1)',
+                    strokeStyle: 'rgba(255,255,255,1)',
+                    fontColor: 'rgba(0,0,0,1)'
+                  });
+                  new_labels.push({
+                    text: 'Unselect All',
+                    fillStyle: 'rgba(0,0,0,1)',
+                    strokeStyle: 'rgba(0,0,0,1)',
+                    fontColor: 'rgba(0,0,0,1)'
+                  });
+                  return new_labels;
+                }
+              }
+            }
+          }
+        }
+      });

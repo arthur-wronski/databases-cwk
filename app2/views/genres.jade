@@ -2,52 +2,100 @@ doctype html
 html
   head
     title= title
-    //-
-      body covers whole page
-      h1 covers header
-      table, th, td, label covers the table and its contents
-      input, button covers the query search
-    style.
-      body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f4f4f4;
-      }
-  
-      h1 {
-        color: #333;
-      }
-
-      table {
-        width: 90%;
-        margin: 20px auto;
-        border-collapse: collapse;
-        background-color: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      } 
-      th, td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-      }
-      tr:hover {
-        background-color: #f5f5f5;
-      }
-      label {
-        display: block;
-        margin-bottom: 5px;
-        color: #333;
-      }
-
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src='https://cdn.jsdelivr.net/npm/chart.js')
   body
-    h1= title
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+
     table
       thead
         tr
-          th UserId
-          th MovieId
+          th Id 
+          th Genre
+          th Average Rating
       tbody
-        each row in data
-          tr
-            td
-              a(href='/genre/' + row.userId)= row.userId
-            td= row.movieId
+        each genre in genres
+          tr(class='row-link', data-url=`/genreInfo/${genre.genreId}`)
+            td= genre.genreId
+            td= genre.name
+            td= genreAverages[genre.genreId-1]
+    
+    canvas#genresChart(width='600', height='200',style="margin-left:30px; margin-right: 70px;")
+
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.row-link').forEach(function(element) {
+          element.addEventListener('click', function() {
+            const url = this.dataset.url;
+            window.location.href = url;
+          });
+        });
+      });
+    
+    script.
+      genreNamesJSON = '#{JSON.stringify(genreNames)}';
+      genreNames = genreNamesJSON.slice(7,genreNamesJSON.length-7).split('&quot;,&quot;');
+      genreRatings = '#{genreRatings}'.split(',X,').map(arr => arr.split(','));
+      let dataset = [];
+      for (var i=0; i<genreRatings.length; i++) {
+        dataset.push({
+          label: genreNames[i],
+          data: genreRatings[i],
+          borderWidth: 1,
+          hidden: true
+        });
+      }
+      
+      const ctx = document.getElementById('genresChart');
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['0.5', '1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'],
+          datasets: dataset
+        },
+        options: {
+          scales: {
+            y: {
+              title: { text:'Frequency', display: true },
+              beginAtZero: true
+            },
+            x: {
+              title: { text: 'Rating ?/5', display: true}
+            }
+          },
+          plugins: {
+            legend: {
+              onClick: (click, legendItem, legend) => {
+                const index = genreNames.indexOf(legendItem.text);
+                legend.chart.data.datasets[index].hidden = !legend.chart.data.datasets[index].hidden;
+                legend.chart.update();
+              },
+              labels: {
+                generateLabels: (chart) => {
+                  let visibility = [];
+                  for (var i=0; i<chart.data.datasets.length; i++) {
+                    if (chart.data.datasets[i].hidden) {
+                      visibility.push('rgba(100,100,100,0.5)');
+                    } else {
+                      visibility.push('rgba(100,100,100,1)');
+                    }
+                  };
+                  return chart.data.datasets.map(
+                    (data, index) => ({
+                      text: data.label,
+                      fillStyle: data.backgroundColor,
+                      strokeStyle: data.backgroundColor,
+                      fontColor: visibility[index]
+                    })
+                  )
+                }
+              }
+            }
+          }
+        }
+      });

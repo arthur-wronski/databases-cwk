@@ -9,6 +9,7 @@ var filmRouter = require('./routes/films');
 var filmInfoRouter = require('./routes/filmInfo');
 var genreListRouter = require('./routes/genres');
 var genreInfoRouter = require('./routes/genreInfo');
+var userInfoRouter = require('./routes/userInfo');
 
 
 var app = express();
@@ -26,9 +27,10 @@ app.use(express.static('indexFolder'))
 
 app.use('/', indexRouter);
 app.use('/films', filmRouter);
-app.use('/info', filmInfoRouter);
+app.use('/filmInfo', filmInfoRouter);
 app.use('/genres', genreListRouter);
-app.use('/genre', genreInfoRouter);
+app.use('/genreInfo', genreInfoRouter);
+app.use('/userInfo', userInfoRouter);
 
 
 // catch 404 and forward to error handler

@@ -2,76 +2,45 @@ doctype html
 html
   head
     title= title
-    //-
-      body covers whole page
-      h1 covers header
-      table, th, td, label covers the table and its contents
-      input, button covers the query search
-    style.
-      body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f4f4f4;
-      }
-  
-      h1 {
-        color: #333;
-      }
-
-      table {
-        width: 90%;
-        margin: 20px auto;
-        border-collapse: collapse;
-        background-color: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      } 
-      th, td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-      }
-      tr:hover {
-        background-color: #f5f5f5;
-      }
-      label {
-        display: block;
-        margin-bottom: 5px;
-        color: #333;
-      }
-
-      
-      input[type='text'] {
-        width: 200px;
-        padding: 8px;
-      }
-      button {
-        padding: 8px 12px;
-        background-color: #85ceeb;
-        color: #333;
-        border: none;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #00bfff;
-      }
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    h1= title
-
-    table 
-      thead
-        each col in allCols
-          th
-            form(action='/films', method='GET')
-              input(type='hidden', name='col', id='col', value=col)
-              input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
-              input(type='hidden', name='query', id='query', value='%')
-              button(type='submit') #{col}
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
     
-    form(action='/films', method='GET')
-      label(for='query')
-      input(type='text', name='query', id='query', placeholder='search keywords')
-      input(type='hidden', name='col', id='col', value=col)
-      input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
-      button(type='submit') Search
+    
+    each col in allCols
+      .button_bar
+        form(action=route, method='GET')
+          input(type='hidden', name='col', id='col', value=col)
+          input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+          input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+          input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
+          button(type='submit') #{col}
+    p
+    .button_bar
+      form(action=route, method='GET')
+        label(for='searchQuery')
+        input(type='text', name='searchQuery', id='searchQuery', placeholder='search keywords')
+        input(type='hidden', name='col', id='col', value=col)
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        button(type='submit') Search
+
+    .button_bar
+      form(action=route, method='GET')
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        button(type='submit') Previous Page
+    
+    .button_bar
+      form(action=route, method='GET')
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        button(type='submit') Next Page
 
     table
       thead
@@ -80,10 +49,25 @@ html
             th= title
       tbody
         each row in data
-          tr(class='row-link', data-url=`/films/${row.userId}`)
+          tr(class='row-link', data-url=`/filmInfo/${row.movieId}`)
             each title in shownCols 
               td= row[title]
 
+    p
+    .button_bar
+      form(action=route, method='GET')
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        button(type='submit') Previous Page
+    
+    .button_bar
+      form(action=route, method='GET')
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        button(type='submit') Next Page
+    
     script.
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.row-link').forEach(function(element) {
