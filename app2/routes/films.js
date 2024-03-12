@@ -15,7 +15,7 @@ router.get('/', async function(req, res) {
     if (itemNum < 0) itemNum = 0;
     
     // only take subset to improve processing
-    let getMovies = `SELECT * FROM Movies WHERE title LIKE ? LIMIT ?,30;`;
+    let getMovies = `SELECT Movies.title, Crew.* FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId WHERE Movies.title LIKE ? LIMIT ?,30;`;
     let [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `${itemNum}`]);
     if (movies.length < 30) itemNum -= 30;
 
