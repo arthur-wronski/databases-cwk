@@ -16,10 +16,16 @@ html
         th Id 
         th Title 
         th Rating
+        th Director 
+        th Cast 
+        th Release Date
       tbody
         td= movie.movieId
         td= movie.title
         td= rating
+        td= movie.Director 
+        td #{movie.TopTwoActors.slice(1,movie.TopTwoActors.length-1).split(', ').map(actor => actor.slice(1,actor.length-1))}
+        td= movie.releaseDate
 
     table
       thead

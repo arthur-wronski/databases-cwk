@@ -12,13 +12,14 @@ html
     
     
     each col in allCols
-      .button_bar
-        form(action=route, method='GET')
-          input(type='hidden', name='col', id='col', value=col)
-          input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
-          input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-          input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
-          button(type='submit') #{col}
+      if col != 'movieId'
+        .button_bar
+          form(action=route, method='GET')
+            input(type='hidden', name='col', id='col', value=col)
+            input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+            input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+            input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
+            button(type='submit') #{col}
     p
     .button_bar
       form(action=route, method='GET')
@@ -46,12 +47,17 @@ html
       thead
         tr
           each title in shownCols
-            th= title
+            if title != 'movieId'
+              th= title
       tbody
         each row in data
           tr(class='row-link', data-url=`/filmInfo/${row.movieId}`)
             each title in shownCols 
-              td= row[title]
+              if title != 'movieId'
+                if title == 'TopTwoActors'
+                  td #{row.TopTwoActors.slice(1,row.TopTwoActors.length-1).split(', ').map(actor => actor.slice(1,actor.length-1))}
+                else
+                  td= row[title]
 
     p
     .button_bar

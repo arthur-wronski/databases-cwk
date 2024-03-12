@@ -14,7 +14,7 @@ router.get('/:movieId', async function(req, res) {
     const movieId = InputSanitizer.sanitizeString(req.params.movieId || '%');
 
     // select the chosen movie using its primary key
-    const getMovie = `SELECT * FROM Movies WHERE movieId = ? LIMIT 1;`;
+    const getMovie = `SELECT * FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId WHERE Movies.movieId = ? LIMIT 1;`;
     const [rowsMovie, fieldsM] = await connection.execute(getMovie, [`${movieId}`]);
     const movie = rowsMovie[0]; // only one as primary
 
