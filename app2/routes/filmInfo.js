@@ -32,8 +32,9 @@ router.get('/:movieId', async function(req, res) {
     // select the genres of this movie
     const getGenres = `
       SELECT Genres.genreId, Genres.name 
-      FROM Genres INNER JOIN MovieGenres ON MovieGenres.genreId=Genres.genreId
-      WHERE MovieGenres.movieId=?;
+      FROM Genres INNER JOIN 
+        (SELECT * FROM MovieGenres WHERE MovieGenres.movieId=?) AS MovieGenresSubset
+      ON MovieGenresSubset.genreId=Genres.genreId;
     `;
     const [genres, fieldsG] = await connection.execute(getGenres, [`${movieId}`]);
     
