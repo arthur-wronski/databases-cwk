@@ -1,8 +1,8 @@
 'use strict';
 const express = require('express');
 const router = express.Router();
-const pool = require('../db'); // Adjusted path since db.js is likely in the parent directory of routes
-const InputSanitizer = require('../inputsanitizer'); // Adjust path as needed
+const pool = require('./db'); // Adjusted path since db.js is likely in the parent directory of routes
+const InputSanitizer = require('./inputsanitizer'); // Adjust path as needed
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser');
