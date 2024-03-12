@@ -1,88 +1,71 @@
-'use strict'
+
+'use strict';
 var express = require('express');
 var router = express.Router();
-var pool = require('./db');     // retrieve pool from db.js
+var pool = require('./db');
 var InputSanitizer = require('./inputsanitizer');
 
-/* using multiple features predict the performance of a film */
-router.get('/add_tag/', async function(req, res) {
-  let connection;
-
-  try {
-    connection = await pool.getConnection();
-    let tags = req.query.tags;
-    let previews = req.query.previews;
-    let tagRate = req.query.tagRate;
-    let previewRate = req.query.previewRate;
-
-    // find new tag's id
-    const tag_query = InputSanitizer.sanitizeString(req.query.new_tag || '%');
-    const search_tag = 'SELECT tagId FROM Tags WHERE tag LIKE ?;';
-    const [allTags, fieldT] = await connection.execute(search_tag, [tag_query]);
-    let new_tag = allTags[0];
-
-    // decipher predicted rating of new tag
-    const getMovies = 'SELECT tags, ratingAv FROM Movies;';
-    const [movies, fieldM] = await connection.execute(getMovies);
-    let new_tag_rating;
-    for (var i=0; i<movies.length; i++){
-      // some method of balancing each movie's use by its value at movie.tags[tag.tagId]
-      // could use ML for this @Ghalia?
-    }    
-
-    // balance use of each tag given
-    tagRate *= tags.length;
-    tags.push(new_tag.tag);
-    tagRate = (tagRate + tag_rating) / tags.length
-
-    // send output to response frontend
-    res.render('predict', { title: 'Predict Film Performance', tags: tags, previews: previews, tagRate: tagRate, previewRate: previewRate });
-  } catch (err) {
-    console.error('Error from predict/p:', err);
-    res.render('error', { message: 'from predict/p', error: err});
-  } finally {
-    if (connection) connection.release();
-  }
-})
-
-router.get('/add_review/', async function(req, res) {
-  let connection;
-
-  try {
-    connection = await pool.getConnection();
-    let tags = req.query.tags;
-    let previews = req.query.previews;
-    let tagRate = req.query.tagRate;
-    let previewRate = req.query.previewRate;
-
-    let new_review = InputSanitizer.sanitizeString(req.query.next_review || '%');
-    previewRate *= previews.length;
-    previews.push(new_review);
-    previewRate = (previewRate + new_review) / previous.length;
-
-    // send output to response frontend
-    res.render('predict', { title: 'Predict Film Performance', tags: tags, previews: previous, tagRate: tagRate, previewRate: previewRate });
-  } catch (err) {
-    console.error('Error from predict/p:', err);
-    res.render('error', { message: 'from predict/p', error: err});
-  } finally {
-    if (connection) connection.release();
-  }
-})
-
-/* initial page before any tags or previews entered */
 router.get('/', async function(req, res) {
-    let connection;
-  
-    try {
-      connection = await pool.getConnection();
-      res.render('predict', { title: 'Predict Film Performance', tags: [], ratingTag: 0, ratingView: 0 });
-    } catch (err) {
-      console.error('Error from predict:', err);
-      res.render('error', { message: 'from predict', error: err});
-    } finally {
-      if (connection) connection.release();
+  let connection;
+
+  try {
+    connection = await pool.getConnection();
+    let searchQuery = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
+    let itemNum = parseInt(InputSanitizer.sanitizeString(req.query.itemNum || '0'));
+    if (itemNum < 0) itemNum = 0;
+
+    let getTags = `SELECT * FROM Tags WHERE tagId LIKE ? LIMIT ?,30;`;
+    let [tags, fieldsT] = await connection.execute(getTags, [`%${searchQuery}%`, `${itemNum}`]);
+
+    const query = `
+      SELECT Viewer.rating, Tags.tagId
+      FROM Tags NATURAL JOIN Viewer;
+    `;
+    
+    const [ratings, fieldV] = await connection.execute(query);
+
+    // we cant be cool
+    // we need to get all the ratings and for each tag get their average and sd
+    // do the thing below this comment in a for loop for each of the tags in the tag list xoxo gossip girl 
+    // for loop to go thourh each tag either with a dictoinary or a 2d array - EACH TAG HAS A CORRESPONDING EXP AND SD 
+    // ALSO COMBINED ONES - PUT TOGETHER THE ONES YOUVE SPECIFCAKH GOTON
+    // ARRAY OF TAGS
+
+    // dictionary
+    let tagAverages = {
+      [tagId]: { exp: averageRating, sdev: standardDeviation }
     }
-  })
+
+    for (let i = 0; i < tags.length; i++) {
+        let tagId = tags[i].tagId;
+
+        let sum = 0, sumSq = 0, n = ratings.length;
+        ratings.forEach(rating => {
+            let value = parseFloat(rating.rating);
+            sum += value;
+            sumSq += value * value;
+        });
+        
+        let mean = n > 0 ? sum / n : 0;
+        let variance = n > 0 ? (sumSq / n - mean * mean) : 0;
+        let sd = Math.sqrt(variance);
+
+        tagAverages[tagId] = { mean, sd };
+    }
+
+    res.render('predict', { 
+        title: 'Predictions', 
+        tags: tags, 
+        searchQuery: searchQuery,
+        itemNum: itemNum,
+        tagAverages: tagAverages 
+    });
+  } catch (err) {
+    console.error('Error from predictions/', err);
+    res.render('error', { message: 'Error loading predictions', error: err });
+  } finally {
+    if (connection) connection.release();
+  }
+});
 
 module.exports = router;
