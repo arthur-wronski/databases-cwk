@@ -67,7 +67,7 @@ def preprocess_crew(links_file_path, crew_file_path, cleaned_crew_file_path):
             tmdb_id = row.get('movie_id')
             movie_id = tmdb_to_movie_id.get(tmdb_id) 
             if movie_id: 
-                release_date = row.get('release_date')
+                release_date = datetime.strptime(row.get('release_date'), '%Y-%m-%d').date()
                 crew_writer.writerow({
                     'movieId': movie_id,
                     'Director': row['Director'],
