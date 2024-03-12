@@ -10,6 +10,12 @@ html
       h1= movie.title
       .dropdown-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+
+    if movie.posterUrl
+      // Display the image with specified size under the dropdown
+      img(src=movie.posterUrl alt=movie.title + " Poster" style="width: 250px; height: auto; display: block; margin: 0 auto;")
+    else
+      p No poster URL found
     
     table 
       thead 
