@@ -17,9 +17,12 @@ router.get('/:userId', async function(req, res) {
     if (itemNum < 0) itemNum = 0;
 
     let getRatings = `
-      SELECT Viewer.movieId, Movies.title, Viewer.rating, Viewer.watchDate 
-      FROM Viewer INNER JOIN Movies ON Viewer.movieId=Movies.movieId
-      WHERE Viewer.userId = ? AND Movies.title LIKE ? 
+      SELECT ThisViewer.movieId, SearchedMovies.title, ThisViewer.rating, ThisViewer.watchDate 
+      FROM 
+        (SELECT * FROM Viewer WHERE Viewer.userId = ?) AS ThisViewer
+      INNER JOIN 
+        (SELECT * FROM Movies WHERE Movies.title LIKE ?) AS SearchedMovies
+      ON ThisViewer.movieId=SearchedMovies.movieId
       LIMIT ?, 10;
     `;
     let [ratings,fieldsR] = await connection.execute(getRatings, [`${userId}`, `%${searchQuery}%`, `${itemNum}`]);
@@ -45,9 +48,10 @@ router.get('/:userId', async function(req, res) {
     const genreRatings = [];
     const genreAverages = [];
     const getRatings_Genre = `
-      SELECT Viewer.rating, MovieGenres.genreId 
-      FROM Viewer NATURAL JOIN MovieGenres 
-      WHERE Viewer.userId=?;
+      SELECT ThisViewer.rating, MovieGenres.genreId 
+      FROM 
+        (SELECT * FROM Viewer WHERE Viewer.userId=?) AS ThisViewer
+      NATURAL JOIN MovieGenres;
     `;
     const [ratings_genre, fieldsRG] = await connection.execute(getRatings_Genre, [`${userId}`]);
     // get ratings of all films in these genres

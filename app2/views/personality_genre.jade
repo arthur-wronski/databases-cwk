@@ -1,0 +1,83 @@
+doctype html
+html
+  head
+    title Correlation
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src='https://cdn.jsdelivr.net/npm/chart.js')
+  body
+    .dropdown
+      h1 Personality-Genre Correlation
+      .dropdown-content
+        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+    
+    p The Correlation Coefficient between viewers with #[strong #{currentTrait}] and their ratings of #[strong #{currentGenre.name}] films is #[u #{regression.coefficient}]
+    canvas#correlationChart(width='600', height='200',style="margin-left:30px; margin-right: 70px;")
+    p 
+
+    table
+      thead
+        tr
+          th Personality Trait
+      tbody
+        each trait in traits
+          tr(class='row-link', data-url=`/correlate/${currentGenre.genreId}&${trait}`)
+            td= trait
+
+    table
+      thead
+        tr
+          th Genre
+      tbody
+        each genre in genres
+          tr(class='row-link', data-url=`/correlate/${genre.genreId}&${currentTrait}`)
+            td= genre.name
+    
+
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.row-link').forEach(function(element) {
+          element.addEventListener('click', function() {
+            const url = this.dataset.url;
+            window.location.href = url;
+          });
+        });
+      });
+
+    script.
+      const dataString = '#{data}';
+      const data = dataString.slice(1,dataString.length-1).split(',X,').map(datapoint => datapoint.split(','));
+
+      const lineOfBestFit = [['0','#{regression.pointStart}'], ['10','#{regression.pointEnd}']];
+
+      const ctx = document.getElementById('correlationChart');
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [{
+              label: 'Datapoints',
+              data: [10, 20, 30, 40]
+          }, {
+              label: 'Line of Best Fit',
+              data: [50, 50, 50, 50],
+          }],
+          labels: ['January', 'February', 'March', 'April']
+        },
+        options: {
+          scales: {
+            y: {
+              title: { text:'Film Rating ?/5', display: true },
+              beginAtZero: true,
+            },
+            x: {
+              title: { text: 'Trait Value', display: true },
+              beginAtZero: true,
+            }
+          },
+          plugins: {
+            title: {text: 'Correlation Plotting', display: true},
+            legend: { display: false }
+          }
+        }
+      });

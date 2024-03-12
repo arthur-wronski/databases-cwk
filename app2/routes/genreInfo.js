@@ -28,12 +28,14 @@ router.get('/:genreId', async function(req, res) {
 
     let getMovies = `
       SELECT Movies.*, Crew.* 
-      FROM (Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId) 
-        INNER JOIN MovieGenres ON Movies.movieId=MovieGenres.movieId 
-      WHERE (Movies.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ?) AND (MovieGenres.genreId = ?) 
+      FROM (Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId)
+        INNER JOIN 
+          (SELECT * FROM MovieGenres WHERE MovieGenres.genreId = ?) AS MoviesOfGenre
+        ON Movies.movieId=MoviesOfGenre.movieId 
+      WHERE Movies.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ?
       LIMIT ?,30;
     `;
-    let [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${genreId}`, `${itemNum}`]);
+    let [movies, fields] = await connection.execute(getMovies, [`${genreId}`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
     if (movies.length < 30) itemNum -= 30;
 
     // set the used columns as selected by the user

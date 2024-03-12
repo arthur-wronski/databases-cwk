@@ -47,6 +47,24 @@ CREATE TABLE IF NOT EXISTS Crew (
     FOREIGN KEY (movieId) REFERENCES Movies(movieId)
 );
 
+CREATE TABLE IF NOT EXISTS Personality (
+    userId VARCHAR(255) PRIMARY KEY,
+    openness DECIMAL(2,1),
+    agreeableness DECIMAL(2,1),
+    emotional_stability DECIMAL(2,1),
+    conscientiousness DECIMAL(2,1),
+    extraversion DECIMAL(2,1)
+);
+
+CREATE TABLE IF NOT EXISTS PersonalityRatings (
+    userId VARCHAR(255),
+    movieId INT,
+    PRIMARY KEY (userId, movieId),
+    rating DECIMAL(2,1),
+    FOREIGN KEY (userId) REFERENCES Personality(userId),
+    FOREIGN KEY (movieId) REFERENCES MovieGenres(movieId)
+);
+
 LOAD DATA INFILE '/var/lib/mysql-files/cleaned_movies.csv'
 INTO TABLE Movies
 FIELDS TERMINATED BY ','
@@ -93,5 +111,17 @@ OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
+LOAD DATA INFILE '/var/lib/mysql-files/streamlined_personality.csv'
+INTO TABLE Personality
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
 
+LOAD DATA INFILE '/var/lib/mysql-files/streamlined_ratings.csv'
+INTO TABLE PersonalityRatings
+FIELDS TERMINATED BY ','
+OPTIONALLY ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
 

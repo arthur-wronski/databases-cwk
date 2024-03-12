@@ -17,7 +17,7 @@
     "morgan": "~1.9.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.7.1",
-    "react": "^18.2.0",
+    "statistics.js": "^1.0.0",
     "styled-jsx": "^5.1.2"
   }
 }
