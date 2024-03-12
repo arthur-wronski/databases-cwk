@@ -17,68 +17,44 @@ html
 
     .button_bar
       form(action='/predict', method='GET')
-        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        input(type='hidden', name='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', value=itemNum-30)
         button(type='submit') Previous Page
     
     .button_bar
       form(action='/predict', method='GET')
-        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        input(type='hidden', name='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', value=itemNum+30)
         button(type='submit') Next Page
     
-
     h2 Selected Tags
     ul#selectedTagsList
+      each tag in selectedTags
+        li= tag
 
-    h2 Average Rating: #{tagAverages}
- 
+    if averageRating
+      h2 Average Rating for Selected Tag: #{averageRating}
 
     table
       thead
         tr
-          th Tag ID
+          th Tag
           th User ID
       tbody
         each tag in tags
-          tr(data-tag-id=tag.tagId onclick="toggleTagSelection(this)")
-            td= tag.tagId
-            td= tag.userId 
-
-
+          tr
+            td
+              a(href=`/predict?selectedTags=${selectedTags.join(',')},${tag.tag}&searchQuery=${searchQuery}&itemNum=${itemNum}`)= tag.tag
+            td= tag.userId
 
     .button_bar
       form(action='/predict', method='GET')
-        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        input(type='hidden', name='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', value=itemNum-30)
         button(type='submit') Previous Page
     
     .button_bar
       form(action='/predict', method='GET')
-        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        input(type='hidden', name='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', value=itemNum+30)
         button(type='submit') Next Page
-
-    script.
-      var selectedTags = [];
-
-      function toggleTagSelection(row) {
-        var tagId = row.getAttribute('data-tag-id');
-        var index = selectedTags.indexOf(tagId);
-        if (index === -1) {
-          selectedTags.push(tagId);
-        } else {
-          selectedTags.splice(index, 1);
-        }
-        updateSelectedTagsDisplay();
-      }
-
-      function updateSelectedTagsDisplay() {
-        var listElement = document.getElementById('selectedTagsList');
-        listElement.innerHTML = '';
-        selectedTags.forEach(function(tagId) {
-          var listItem = document.createElement('li');
-          listItem.textContent = 'Tag ID: ' + tagId;
-          listElement.appendChild(listItem);
-        });
-      }
