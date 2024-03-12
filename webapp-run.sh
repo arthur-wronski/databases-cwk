@@ -2,7 +2,7 @@
 echo "Starting script..."
 
 # Ensure this script is run from its containing directory
-cd "$(dirname "$0")"
+cd setup/"$(dirname "$0")"
 
 # Preprocess data
 echo "Running Python preprocessing script..."
