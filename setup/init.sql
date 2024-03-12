@@ -33,13 +33,14 @@ CREATE TABLE IF NOT EXISTS Tags (
     userId INT,
     movieId INT,
     tag VARCHAR(100),
+    PRIMARY KEY (userId, movieId, tag),
     FOREIGN KEY (movieId) REFERENCES Movies(movieId),
     FOREIGN KEY (userId) REFERENCES Viewer(userId),
     INDEX(userId, movieId)
 );
 
 CREATE TABLE IF NOT EXISTS Crew (
-    movieId INT,
+    movieId INT PRIMARY KEY,
     Director VARCHAR(100),
     TopTwoActors TEXT,
     releaseDate DATE ,
@@ -60,8 +61,6 @@ FIELDS TERMINATED BY ','
 ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
-
-
 
 LOAD DATA INFILE '/var/lib/mysql-files/genres.csv'
 INTO TABLE Genres
