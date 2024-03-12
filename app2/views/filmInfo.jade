@@ -10,6 +10,10 @@ html
       h1= movie.title
       .dropdown-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+
+    // Display the movie poster if it exists
+    if movie.posterUrl
+      img(src=movie.posterUrl alt="Poster for " + movie.title)
     
     table 
       thead 
@@ -20,24 +24,24 @@ html
         th Cast 
         th Release Date
       tbody
-        td= movie.movieId
-        td= movie.title
-        td= rating
-        td= movie.Director 
-        td #{movie.TopTwoActors.slice(1,movie.TopTwoActors.length-1).split(', ').map(actor => actor.slice(1,actor.length-1))}
-        td= movie.releaseDate
+        tr
+          td= movie.movieId
+          td= movie.title
+          td= rating
+          td= movie.Director 
+          td= movie.TopTwoActors.slice(1, movie.TopTwoActors.length - 1).split(', ').map(actor => actor.slice(1, actor.length - 1)).join(', ')
+          td= movie.releaseDate
 
     table
       thead
         tr
-          th
-           p: #[a(href='/genres') Genres]
+          th Genre(s)
       tbody
-        each genre in genres 
-          td= genre.name
+        tr
+          td= genres.map(genre => genre.name).join(', ')
 
     p
-    canvas#genresChart(width='600', height='200',style="margin-left:30px; margin-right: 70px;")
+    canvas#genresChart(width='600', height='200', style="margin-left:30px; margin-right:70px;")
     p
 
     table
@@ -54,13 +58,13 @@ html
             td= viewer.watchDate 
     
     .button_bar
-      form(action='/filmInfo/'+movie.movieId, method='GET')
-        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+      form(action='/filmInfo/' + movie.movieId, method='GET')
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum - 30)
         button(type='submit') Previous Page
     
     .button_bar
-      form(action='/filmInfo/'+movie.movieId, method='GET')
-        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+      form(action='/filmInfo/' + movie.movieId, method='GET')
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum + 30)
         button(type='submit') Next Page
     
     script.
@@ -74,9 +78,9 @@ html
       });
     
     script.
-      ratingFrequencies = '#{ratingFrequencies}'.split(',');
+      const ratingFrequencies = '#{ratingFrequencies}'.split(',');
       let dataset = [];
-      for (var i=0; i<1; i++) {
+      for (let i = 0; i < 1; i++) {
         dataset.push({
           label: 'User Ratings',
           data: ratingFrequencies,
