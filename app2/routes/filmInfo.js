@@ -18,6 +18,12 @@ router.get('/:movieId', async function(req, res) {
     const [rowsMovie, fieldsM] = await connection.execute(getMovie, [`${movieId}`]);
     const movie = rowsMovie[0]; // only one as primary
 
+    if (movie.releaseDate) {
+      const date = new Date(movie.releaseDate);
+      const formattedDate = date.toLocaleDateString('en-GB');
+      movie.releaseDate = formattedDate;
+    }
+
     // select the genres of this movie
     const getGenres = `SELECT Genres.genreId, Genres.name FROM Genres INNER JOIN MovieGenres ON (MovieGenres.genreId=Genres.genreId) WHERE MovieGenres.movieId=?;`;
     const [genres, fieldsG] = await connection.execute(getGenres, [`${movieId}`]);

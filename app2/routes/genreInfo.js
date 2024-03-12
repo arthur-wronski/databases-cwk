@@ -21,8 +21,8 @@ router.get('/:genreId', async function(req, res) {
     const [rowsGenre, fieldsG] = await connection.execute(getGenre, [`${genreId}`]);
     const genre = rowsGenre[0].name; // only one as primary
 
-    let getMovies = `SELECT Movies.*, Crew.* FROM (Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId) INNER JOIN MovieGenres ON Movies.movieId=MovieGenres.movieId WHERE Movies.title LIKE ? AND MovieGenres.genreId = ? LIMIT ?,30;`;
-    let [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `${genreId}`, `${itemNum}`]);
+    let getMovies = `SELECT Movies.*, Crew.* FROM (Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId) INNER JOIN MovieGenres ON Movies.movieId=MovieGenres.movieId WHERE (Movies.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ?) AND (MovieGenres.genreId = ?) LIMIT ?,30;`;
+    let [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${genreId}`, `${itemNum}`]);
     if (movies.length < 30) itemNum -= 30;
 
     // set the used columns as selected by the user
@@ -33,6 +33,14 @@ router.get('/:genreId', async function(req, res) {
     if (shownColQuery==null) shownCols = allCols;
     else shownCols = shownColQuery.split(',');
     if (colQuery!=null) shownCols = add_or_remove(allCols, shownCols, colQuery);
+
+    movies.forEach(movie => {
+      if (movie.releaseDate) {
+        const date = new Date(movie.releaseDate);
+        const formattedDate = date.toLocaleDateString('en-GB');
+        movie.releaseDate = formattedDate;
+      }
+    });
 
     // render the data
     res.render('films', { title: genre, data: movies, allCols: allCols, shownCols: shownCols, searchQuery: searchQuery, itemNum: itemNum, route: '/genreInfo/'+genreId });
