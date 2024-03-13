@@ -41,13 +41,20 @@ router.get('/:movieId', async function(req, res) {
         const poster = postersData.find(p => p.tmdb_id.toString() === tmdbId);
 
         const getMovie = `
-            SELECT * 
+            SELECT Movies.*, Crew.* 
             FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId 
             WHERE Movies.movieId = ? 
             LIMIT 1;
         `;
         const [rowsMovie, fieldsM] = await connection.execute(getMovie, [`${movieId}`]);
         const movie = rowsMovie[0]; // only one as primary
+
+        const getTags = `
+            SELECT *
+            FROM Tags
+            WHERE movieId = ?;
+        `;
+        const [tags, fieldsT] = await connection.execute(getTags, [`${movieId}`]);
 
         if (movie.releaseDate) {
             const date = new Date(movie.releaseDate);
@@ -94,11 +101,8 @@ router.get('/:movieId', async function(req, res) {
         }
 
         res.render('filmInfo', {
-            movie: movie,
-            genres: genres,
-            viewers: viewers,
-            rating: rating,
-            ratingFrequencies: ratingFrequencies.join(','),
+            movie: movie, genres: genres, viewers: viewers, tags: tags,
+            rating: rating, ratingFrequencies: ratingFrequencies.join(','),
             itemNum: itemNum
         });
     } catch (err) {

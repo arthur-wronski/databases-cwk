@@ -9,7 +9,7 @@ html
     .dropdown
       h1= movie.title
       .dropdown-content
-        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict Performance]
+        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict]
 
     if movie.posterUrl
       // Display the image with specified size under the dropdown
@@ -41,6 +41,14 @@ html
       tbody
         each genre in genres 
           td= genre.name
+    
+    table
+      thead
+        tr
+          th Tags
+      tbody
+        each tag in tags 
+          td= tag.tag
 
     p
     canvas#genresChart(width='600', height='200',style="margin-left:30px; margin-right: 70px;")
