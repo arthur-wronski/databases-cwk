@@ -17,9 +17,10 @@ router.get('/:genreTrait', async function(req, res) {
     let getGenre = `
         SELECT *
         FROM Genres
-    ;`;
+        ORDER BY genreId;
+    `;
     let [genres, fieldsG] = await connection.execute(getGenre);
-    const currentGenre = genres[genreId];
+    const currentGenre = genres[genreId-1];
 
     const traits = ['openness',  'agreeableness', 'emotional_stability', 'conscientiousness', 'extraversion'];
     const currentTrait = InputSanitizer.sanitizeString(trait);

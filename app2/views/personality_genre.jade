@@ -13,12 +13,12 @@ html
       .dropdown-content
         p: #[a(href='/predict') Predict Performance] #[a(href='/correlate/1&extraversion') Predict Audience]
     
-    p Pick a genre and personality trait to compare to measure the correlation between them to discover the type of people to watch an upcoming film.
+    p Pick a genre and personality trait to compare to measure the correlation between them and discover the type of people to watch an upcoming film.
       
     
     p The Correlation Coefficient between viewers with #[strong #{currentTrait}] and their ratings of #[strong #{currentGenre.name}] films is #[u #{regression.coefficient}]
     canvas#correlationChart(width='600', height='200',style="margin-left:30px; margin-right: 70px;")
-    p 
+    p
 
     table
       thead
@@ -32,10 +32,12 @@ html
     table
       thead
         tr
+          th Id
           th Genre
       tbody
         each genre in genres
           tr(class='row-link', data-url=`/correlate/${genre.genreId}&${currentTrait}`)
+            td= genre.genreId
             td= genre.name
     
 
