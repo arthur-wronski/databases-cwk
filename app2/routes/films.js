@@ -16,7 +16,7 @@ router.get('/', async function(req, res) {
     
     // only take subset to improve processing
     let getMovies = `
-      SELECT Movies.title, Crew.* 
+      SELECT Movies.title, Crew.*
       FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId 
       WHERE Movies.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ? 
       LIMIT ?,30;
