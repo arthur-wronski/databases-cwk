@@ -25,7 +25,7 @@ router.get('/', async function(req, res) {
         COUNT(CASE WHEN Viewer.rating=5.0 THEN 1 END) AS count50
       FROM Viewer NATURAL JOIN MovieGenres INNER JOIN Genres ON MovieGenres.genreId=Genres.genreId
       GROUP BY MovieGenres.genreId
-      ORDER BY MovieGenres.genreId;
+      ORDER BY average_rating DESC;
     `;
     const [genres, fields] = await connection.execute(getReviews);
     const genreNames = genres.map(genre => genre.name);
