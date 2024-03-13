@@ -36,11 +36,11 @@ html
           th Rating 
           th Date
       tbody
-        each rating in ratings
-          tr(class='row-link', data-url=`/filmInfo/${rating.movieId}`)
-            td= rating.title 
-            td= rating.rating 
-            td= rating.watchDate
+        each film in movies
+          tr(class='row-link', data-url=`/filmInfo/${film.movieId}`)
+            td= film.title 
+            td= film.rating 
+            td= film.watchDate
     
     canvas#genresChart(width='600', height='200',style="margin-left:30px; margin-right: 70px;")
 

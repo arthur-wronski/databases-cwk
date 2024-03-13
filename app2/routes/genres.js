@@ -2,7 +2,6 @@
 var express = require('express');
 var router = express.Router();
 var pool = require('./db');
-var InputSanitizer = require('./inputsanitizer'); // import sanitizer
 
 
 /* Display all genres */
@@ -10,46 +9,29 @@ router.get('/', async function(req, res) {
   let connection;
   try {
     connection = await pool.getConnection();
-
-    // get list of genres
-    const getGenres = `
-      SELECT * 
-      FROM Genres 
-      ORDER BY genreId;`;
-    const [genres, fieldsG] = await connection.execute(getGenres);
-
-    // get the graph data of the genres to compare
-    const genreNames = [];
-    const genreRatings = [];
-    const genreAverages = [];
-    const getReviews = `
-      SELECT Viewer.rating, MovieGenres.genreId 
-      FROM Viewer NATURAL JOIN MovieGenres;
-    `;
-    const [ratings, fieldsR] = await connection.execute(getReviews);
-    // get ratings of all films in these genres
-    for (var i=0; i<genres.length; i++){
-      // initialise to count frequency of ratings
-      genreNames.push(genres[i].name);
-      genreRatings.push([0,0,0,0,0,0,0,0,0,0,'X']);
-      genreAverages.push(0);
-    }
-    for (var i=0; i<ratings.length; i++){
-      // add each rating to associated genre counter
-      genreRatings[parseInt(ratings[i].genreId)-1][parseInt(ratings[i].rating * 2.0)-1] += 1;
-      genreAverages[parseInt(ratings[i].genreId)-1] += parseInt(ratings[i].rating * 2.0);
-    }
-    // fit the average rating of each genre
-    for (var i=0; i<genreAverages.length; i++){
-      let total_ratings = 0;
-      for (var j=0; j<10; j++){
-        total_ratings += genreRatings[i][j];
-      }
-      genreAverages[i] = (genreAverages[i] / (total_ratings*2)).toPrecision(3);
-    }  
     
-    // Render the genre data for comparisons
-    res.render('genres', { title: 'Genres', genres: genres, genreNames: genreNames, genreRatings: genreRatings, genreAverages: genreAverages });
+    const getReviews = `
+      SELECT MovieGenres.genreId, Genres.name,
+        AVG(Viewer.rating) AS average_rating,
+        COUNT(CASE WHEN Viewer.rating=0.5 THEN 1 END) AS count05,
+        COUNT(CASE WHEN Viewer.rating=1.0 THEN 1 END) AS count10,
+        COUNT(CASE WHEN Viewer.rating=1.5 THEN 1 END) AS count15,
+        COUNT(CASE WHEN Viewer.rating=2.0 THEN 1 END) AS count20,
+        COUNT(CASE WHEN Viewer.rating=2.5 THEN 1 END) AS count25,
+        COUNT(CASE WHEN Viewer.rating=3.0 THEN 1 END) AS count30,
+        COUNT(CASE WHEN Viewer.rating=3.5 THEN 1 END) AS count35,
+        COUNT(CASE WHEN Viewer.rating=4.0 THEN 1 END) AS count40,
+        COUNT(CASE WHEN Viewer.rating=4.5 THEN 1 END) AS count45,
+        COUNT(CASE WHEN Viewer.rating=5.0 THEN 1 END) AS count50
+      FROM Viewer NATURAL JOIN MovieGenres INNER JOIN Genres ON MovieGenres.genreId=Genres.genreId
+      GROUP BY MovieGenres.genreId
+      ORDER BY MovieGenres.genreId;
+    `;
+    const [genres, fields] = await connection.execute(getReviews);
+    const genreNames = genres.map(genre => genre.name);
+    const genreRatings = genres.map(genre => [genre.count05, genre.count10, genre.count15, genre.count20, genre.count25, genre.count30, genre.count35, genre.count40, genre.count45, genre.count50, 'X']);
+    
+    res.render('genres', { title: 'Genres', genres: genres, genreNames: genreNames, genreRatings: genreRatings })
   } catch (err) {
     console.error('Error from genres/', err);
     res.render('error', { message: 'from genres/', error: err});

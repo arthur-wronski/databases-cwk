@@ -16,7 +16,8 @@ router.get('/:userId', async function(req, res) {
     let itemNum = parseInt(InputSanitizer.sanitizeString(req.query.itemNum || '0'));
     if (itemNum < 0) itemNum = 0;
 
-    let getRatings = `
+    // get individual movie ratings
+    let getRatings_Movie = `
       SELECT ThisViewer.movieId, SearchedMovies.title, ThisViewer.rating, ThisViewer.watchDate 
       FROM 
         (SELECT * FROM Viewer WHERE Viewer.userId = ?) AS ThisViewer
@@ -25,10 +26,10 @@ router.get('/:userId', async function(req, res) {
       ON ThisViewer.movieId=SearchedMovies.movieId
       LIMIT ?, 10;
     `;
-    let [ratings,fieldsR] = await connection.execute(getRatings, [`${userId}`, `%${searchQuery}%`, `${itemNum}`]);
-    if (ratings.length < 10) itemNum -= 10;
+    let [movies,fieldsM] = await connection.execute(getRatings_Movie, [`${userId}`, `%${searchQuery}%`, `${itemNum}`]);
+    if (movies.length < 10) itemNum -= 10;
     
-    ratings.forEach(rating => {
+    movies.forEach(rating => {
       if (rating.watchDate) {
         const date = new Date(rating.watchDate);
         const formattedDate = date.toLocaleDateString('en-GB');
@@ -36,49 +37,32 @@ router.get('/:userId', async function(req, res) {
       }
     });
 
-    // get list of genres
-    const getGenres = `
-      SELECT * 
-      FROM Genres 
-      ORDER BY genreId;
-    `;
-    const [genres, fieldsG] = await connection.execute(getGenres);
     // get the graph data of the genres to compare
-    const genreNames = [];
-    const genreRatings = [];
-    const genreAverages = [];
     const getRatings_Genre = `
-      SELECT ThisViewer.rating, MovieGenres.genreId 
+      SELECT MovieGenres.genreId, Genres.name,
+        COUNT(CASE WHEN ThisViewer.rating=0.5 THEN 1 END) AS count05,
+        COUNT(CASE WHEN ThisViewer.rating=1.0 THEN 1 END) AS count10,
+        COUNT(CASE WHEN ThisViewer.rating=1.5 THEN 1 END) AS count15,
+        COUNT(CASE WHEN ThisViewer.rating=2.0 THEN 1 END) AS count20,
+        COUNT(CASE WHEN ThisViewer.rating=2.5 THEN 1 END) AS count25,
+        COUNT(CASE WHEN ThisViewer.rating=3.0 THEN 1 END) AS count30,
+        COUNT(CASE WHEN ThisViewer.rating=3.5 THEN 1 END) AS count35,
+        COUNT(CASE WHEN ThisViewer.rating=4.0 THEN 1 END) AS count40,
+        COUNT(CASE WHEN ThisViewer.rating=4.5 THEN 1 END) AS count45,
+        COUNT(CASE WHEN ThisViewer.rating=5.0 THEN 1 END) AS count50
       FROM 
         (SELECT * FROM Viewer WHERE Viewer.userId=?) AS ThisViewer
-      NATURAL JOIN MovieGenres;
+      NATURAL JOIN MovieGenres INNER JOIN Genres ON MovieGenres.genreId=Genres.genreId
+      GROUP BY MovieGenres.genreId;
     `;
-    const [ratings_genre, fieldsRG] = await connection.execute(getRatings_Genre, [`${userId}`]);
-    // get ratings of all films in these genres
-    for (var i=0; i<genres.length; i++){
-      // initialise to count frequency of ratings
-      genreNames.push(genres[i].name);
-      genreRatings.push([0,0,0,0,0,0,0,0,0,0,'X']);
-      genreAverages.push(0);
-    }
-    for (var i=0; i<ratings_genre.length; i++){
-      // add each rating to associated genre counter
-      genreRatings[parseInt(ratings_genre[i].genreId)-1][parseInt(ratings_genre[i].rating * 2.0)-1] += 1;
-      genreAverages[parseInt(ratings_genre[i].genreId)-1] += parseInt(ratings_genre[i].rating * 2.0);
-    }
-    // fit the average rating of each genre
-    for (var i=0; i<genreAverages.length; i++){
-      let total_ratings = 0;
-      for (var j=0; j<10; j++){
-        total_ratings += genreRatings[i][j];
-      }
-      genreAverages[i] = (genreAverages[i] / (total_ratings*2)).toPrecision(3);
-    }  
+    const [genres, fieldsG] = await connection.execute(getRatings_Genre, [`${userId}`]);
+    const genreNames = genres.map(genre => genre.name);
+    const genreRatings = genres.map(genre => [genre.count05, genre.count10, genre.count15, genre.count20, genre.count25, genre.count30, genre.count35, genre.count40, genre.count45, genre.count50, 'X']);
     
     res.render('userInfo', { 
       id: userId,
       searchQuery: searchQuery, itemNum: itemNum, 
-      ratings: ratings, genreNames: genreNames, genreRatings: genreRatings });
+      movies: movies, genreNames: genreNames, genreRatings: genreRatings });
   } catch (err) {
     console.error('Error from userInfo/', err);
     res.render('error', { message: 'Error in userInfo', error: err });
