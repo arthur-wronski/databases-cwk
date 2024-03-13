@@ -32,12 +32,10 @@ html
     table
       thead
         tr
-          th Id
           th Genre
       tbody
         each genre in genres
           tr(class='row-link', data-url=`/correlate/${genre.genreId}&${currentTrait}`)
-            td= genre.genreId
             td= genre.name
     
 
