@@ -53,16 +53,16 @@ html
       const ctx = document.getElementById('correlationChart');
 
       new Chart(ctx, {
-        type: 'line',
         data: {
           datasets: [{
+              type: 'scatter',
               label: 'Datapoints',
-              data: [10, 20, 30, 40]
+              data: data
           }, {
+              type: 'line',
               label: 'Line of Best Fit',
-              data: [50, 50, 50, 50],
-          }],
-          labels: ['January', 'February', 'March', 'April']
+              data: lineOfBestFit,
+          }]
         },
         options: {
           scales: {
