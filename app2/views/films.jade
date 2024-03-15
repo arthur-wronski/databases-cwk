@@ -9,8 +9,12 @@ html
       h1= title
       .dropdown-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict]
-    
-    
+
+    if route == '/films'
+      p Here you can view all movies in our database. Click on column headers to show or hide information as needed. For more detailed information on a movie, click on its row to go to its specific page.
+    else
+      p This page displays all the movies associated with your chosen genre.
+
     each col in allCols
       if col != 'movieId'
         .button_bar
@@ -35,7 +39,7 @@ html
         input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
         input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
         button(type='submit') Previous Page
-    
+
     .button_bar
       form(action=route, method='GET')
         input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
@@ -52,28 +56,13 @@ html
       tbody
         each row in data
           tr(class='row-link', data-url=`/filmInfo/${row.movieId}`)
-            each title in shownCols 
+            each title in shownCols
               if title != 'movieId'
                 if title == 'TopTwoActors'
                   td #{row.TopTwoActors.slice(1,row.TopTwoActors.length-1).split(', ').map(actor => actor.slice(1,actor.length-1))}
                 else
                   td= row[title]
 
-    p
-    .button_bar
-      form(action=route, method='GET')
-        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
-        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
-        button(type='submit') Previous Page
-    
-    .button_bar
-      form(action=route, method='GET')
-        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
-        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
-        button(type='submit') Next Page
-    
     script.
       document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('.row-link').forEach(function(element) {

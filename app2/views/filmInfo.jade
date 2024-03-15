@@ -11,12 +11,16 @@ html
       .dropdown-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict]
 
+    p Here you can see all the information about your chosen film, including its genres, tags, and ratings.
+
+
     if movie.posterUrl
       // Display the image with specified size under the dropdown
       img(src=movie.posterUrl alt=movie.title + " Poster" style="width: 250px; height: auto; display: block; margin: 0 auto;")
     else
       p No poster URL found
     
+
     table 
       thead 
         th Id 
