@@ -23,7 +23,10 @@ router.get('/', async function(req, res) {
     `;
     // LAST PAGE JUMP BACK TWICE - FIX
     let [tags, fieldsT] = await connection.execute(getTags, [`%${tagSearch}%`, `${itemNum}`]);
-    if (tags.length < 5) itemNum -= 5;
+    if (tags.length == 0) {
+      itemNum -= 5;
+      [tags, fieldsT] = await connection.execute(getTags, [`%${tagSearch}%`, `${itemNum}`]);
+    }
     
     // update usedTags
     let usedTags = [];
@@ -93,10 +96,13 @@ router.get('/examples', async function(req, res) {
       SELECT * 
       FROM Movies 
       WHERE title LIKE ? 
-      LIMIT ?,30;
+      LIMIT ?,10;
     `;
     let [movies, fieldsM] = await connection.execute(getMovies, [`%${filmSearch}%`, `${itemNum}`]);
-    if (movies.length < 30) itemNum -= 30;
+    if (movies.length == 0) {
+      itemNum -= 10;
+      [movies, fieldsM] = await connection.execute(getMovies, [`%${filmSearch}%`, `${itemNum}`]);
+    }
 
     let movieId = parseInt(InputSanitizer.sanitizeString(req.query.movieId || '1'));
     let movieTitle = InputSanitizer.sanitizeString(req.query.movieTitle || 'Toy Story (1995)');
@@ -121,8 +127,8 @@ router.get('/examples', async function(req, res) {
 
     res.render('predictExample', { title: 'Predict Film Performance',
       movies: movies, filmSearch: filmSearch, itemNum: itemNum,
-      movieId: movieId, movieTitle: movieTitle, true_rating: film_rating[0].average.toPrecision(3),
-      average: mu, start: Math.max(0,mu-2*sigma).toPrecision(3), end: Math.min(5,mu+2*sigma).toPrecision(3)
+      movieId: movieId, movieTitle: movieTitle, true_rating: parseFloat(film_rating[0].average).toPrecision(3),
+      average: mu.toPrecision(3), start: Math.max(0,mu-2*sigma).toPrecision(3), end: Math.min(5,mu+2*sigma).toPrecision(3)
     });
 
   } catch (err) {
@@ -140,8 +146,8 @@ function getTagRating(tags_ratings){
     average += parseFloat(tags_ratings[i].average);
     std_deviation += parseFloat(tags_ratings[i].std_deviation);
   }
-  average = (average / tags_ratings.length).toPrecision(3);
-  std_deviation = (std_deviation / Math.sqrt(tags_ratings.length)).toPrecision(3);
+  average = (average / tags_ratings.length);
+  std_deviation = (std_deviation / Math.sqrt(tags_ratings.length));
   return [average, std_deviation];
 }
 

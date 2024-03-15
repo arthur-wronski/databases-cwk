@@ -77,8 +77,11 @@ router.get('/:movieId', async function(req, res) {
             FROM Viewer WHERE movieId=? 
             LIMIT ?,30;
         `;
-        const [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`, `${itemNum}`]);
-        if (viewers.length < 30) itemNum -= 30;
+        let [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`, `${itemNum}`]);
+        if (viewers.length == 0) {
+            itemNum -= 30;
+            [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`, `${itemNum}`]);
+        }
 
         let ratingFrequencies = [0,0,0,0,0,0,0,0,0,0];
         let rating = 0;
