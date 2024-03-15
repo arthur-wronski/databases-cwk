@@ -22,7 +22,7 @@ The website is divided into three main sections:
 
 - **Functionality**: This feature calculates and predicts a movie's expected rating based on the tags associated with it and its preview ratings.
 
-### Setup and Deployment
-
-- **Data Preparation**: cd into app2/setup, run: "chmod +x setup.sh" to compile the script, run the bash script using: "./setup.sh", it will clean the data, set up the docker containers and import the data into an SQL database. Everything will be ready to view at http://localhost:3000
-
+### SETUP AND RUN INSTRUCTIONS
+- From the root folder (where this README.md lies), compile and run the web-app with the respective commands to be able to view the webpage from http://localhost:3000.
+> chmod +x run.sh
+> ./run.sh
