@@ -11,6 +11,7 @@ var genreListRouter = require('./routes/genres');
 var genreInfoRouter = require('./routes/genreInfo');
 var userInfoRouter = require('./routes/userInfo');
 var correlateRouter = require('./routes/personality_genre');
+var predictRouter = require('./routes/predict');
 
 
 var app = express();
@@ -33,6 +34,7 @@ app.use('/genres', genreListRouter);
 app.use('/genreInfo', genreInfoRouter);
 app.use('/userInfo', userInfoRouter);
 app.use('/correlate', correlateRouter);
+app.use('/predict', predictRouter);
 
 
 // catch 404 and forward to error handler
