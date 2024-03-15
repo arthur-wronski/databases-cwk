@@ -36,10 +36,7 @@ router.get('/:genreId', async function(req, res) {
       LIMIT ?,30;
     `;
     let [movies, fields] = await connection.execute(getMovies, [`${genreId}`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
-    if (movies.length == 0) {
-      itemNum -= 30;
-      [movies, fields] = await connection.execute(getMovies, [`${genreId}`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
-    }
+    if (movies.length < 30) itemNum -= 30;
 
     // set the used columns as selected by the user
     const shownColQuery = req.query.shownCols;
@@ -66,7 +63,12 @@ router.get('/:genreId', async function(req, res) {
   } finally {
     if (connection) connection.release();
   }
-})
+});
+
+router.get('*', function(req, res) {
+  res.redirect('/genres');
+});
+
 
 function add_or_remove(allEls, shownEls, element){
   const index = shownEls.indexOf(element);

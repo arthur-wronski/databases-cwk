@@ -77,11 +77,8 @@ router.get('/:movieId', async function(req, res) {
             FROM Viewer WHERE movieId=? 
             LIMIT ?,30;
         `;
-        let [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`, `${itemNum}`]);
-        if (viewers.length == 0) {
-            itemNum -= 30;
-            [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`, `${itemNum}`]);
-        }
+        const [viewers, fieldsV] = await connection.execute(getViewers, [`${movieId}`, `${itemNum}`]);
+        if (viewers.length < 30) itemNum -= 30;
 
         let ratingFrequencies = [0,0,0,0,0,0,0,0,0,0];
         let rating = 0;
@@ -115,5 +112,10 @@ router.get('/:movieId', async function(req, res) {
         if (connection) connection.release();
     }
 });
+
+router.get('*', function(req, res) {
+    res.redirect('/films');
+});
+
 
 module.exports = router;
