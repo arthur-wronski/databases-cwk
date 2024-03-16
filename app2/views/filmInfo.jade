@@ -6,9 +6,9 @@ html
       link(rel='stylesheet', href='/stylesheets/style.css')
     script(src='https://cdn.jsdelivr.net/npm/chart.js')
   body
-    .dropdown
+    .menu
       h1= movie.title
-      .dropdown-content
+      .menu-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict]
 
     p Here you can see all the information about your chosen film, including its genres, tags, and ratings.

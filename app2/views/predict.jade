@@ -5,11 +5,11 @@ html
     block stylesheets
       link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    .dropdown
+    .menu
       h1= title
-      .dropdown-content
+      .menu-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict]
-      .dropdown-content
+      .menu-content
         p: #[a(href='/predict') Predict Performance] #[a(href='/correlate/1&extraversion') Predict Audience]
     
     if preview_average == 'NaN' || preview_start == 'NaN' || preview_end == 'NaN'

@@ -6,11 +6,11 @@ html
       link(rel='stylesheet', href='/stylesheets/style.css')
     script(src='https://cdn.jsdelivr.net/npm/chart.js')
   body
-    .dropdown
-      h1 Personality-Genre Correlation
-      .dropdown-content
+    .menu
+      h1= title
+      .menu-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict]
-      .dropdown-content
+      .menu-content
         p: #[a(href='/predict') Predict Performance] #[a(href='/correlate/1&extraversion') Predict Audience]
     
     p Pick a genre and personality trait to compare to measure the correlation between them and discover the type of people to watch an upcoming film.

@@ -6,9 +6,9 @@ html
       link(rel='stylesheet', href='/stylesheets/style.css')
     script(src='https://cdn.jsdelivr.net/npm/chart.js')
   body
-    .dropdown
+    .menu
       h1= title
-      .dropdown-content
+      .menu-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict]
 
     p Here, you can view all the genres in our database. Click on any genre for more detailed information. You can also click the genres in the legend of the graph to compare rating distributions.
@@ -21,22 +21,13 @@ html
           th Average Rating
       tbody
         each genre in genres
-          tr(class='row-link', data-url=`/genreInfo/${genre.genreId}`)
+          tr
             td= genre.genreId
             td= genre.name
             td= genre.average_rating
     
     canvas#genresChart(width='600', height='200',style="margin-left:30px; margin-right: 70px;")
 
-    script.
-      document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.row-link').forEach(function(element) {
-          element.addEventListener('click', function() {
-            const url = this.dataset.url;
-            window.location.href = url;
-          });
-        });
-      });
     
     script.
       genreNamesJSON = '#{JSON.stringify(genreNames)}';

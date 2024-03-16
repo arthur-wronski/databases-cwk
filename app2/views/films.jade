@@ -5,9 +5,9 @@ html
     block stylesheets
       link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    .dropdown
+    .menu
       h1= title
-      .dropdown-content
+      .menu-content
         p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict]
 
     if route == '/films'
@@ -15,16 +15,6 @@ html
     else
       p This page displays all the movies associated with your chosen genre.
 
-    each col in allCols
-      if col != 'movieId'
-        .button_bar
-          form(action=route, method='GET')
-            input(type='hidden', name='col', id='col', value=col)
-            input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
-            input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
-            input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
-            button(type='submit') #{col}
-    p
     .button_bar
       form(action=route, method='GET')
         label(for='searchQuery')
@@ -46,6 +36,38 @@ html
         input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
         input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
         button(type='submit') Next Page
+
+    .button_bar
+      .dropdown
+        .dropdown-header(onclick='toggleDropdown(this)') Choose Columns
+        .dropdown-content
+          each col in allCols
+            if col != 'movieId'
+              form(action=route, method='GET')
+                input(type='hidden', name='col', id='col', value=col)
+                input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+                input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+                input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
+                button(type='submit') #{col}
+    
+    .button_bar
+      .dropdown
+        if genreShown >= 0
+          .dropdown-header(onclick='toggleDropdown(this)') #{genres[genreShown].name}
+        else 
+          .dropdown-header(onclick='toggleDropdown(this)') Choose Genre
+        .dropdown-content
+          form(action=route, method='GET')
+            input(type='hidden', name='genreId', id='genreId', value=0)
+            input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+            input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+            button(type='submit') All Genres
+          each genre in genres
+            form(action=route, method='GET')
+              input(type='hidden', name='genreId', id='genreId', value=genre.genreId)
+              input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+              input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+              button(type='submit') #{genre.name}
 
     table
       thead
@@ -86,3 +108,13 @@ html
           });
         });
       });
+    
+    script.
+      function toggleDropdown(element) {
+        var content = element.nextElementSibling;
+        if (content.style.display === 'block') {
+          content.style.display = 'none';
+        } else {
+          content.style.display = 'block';
+        }
+      }

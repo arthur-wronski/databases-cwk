@@ -11,22 +11,38 @@ router.get('/', async function(req, res) {
     connection = await pool.getConnection();
 
     let searchQuery = InputSanitizer.sanitizeString(req.query.searchQuery || '%');
+    let genreId = parseInt(InputSanitizer.sanitizeString(req.query.genreId || '0'));
     let itemNum = parseInt(InputSanitizer.sanitizeString(req.query.itemNum || '0'));
     if (itemNum < 0) itemNum = 0;
     
-    // only take subset to improve processing
-    let getMovies = `
-      SELECT Movies.title, Crew.*
-      FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId 
-      WHERE Movies.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ? 
-      LIMIT ?,30;
-    `;
-    let [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
-    if (movies.length == 0) {
-      itemNum -= 30;
+    let movies; let fields;
+    if (genreId == 0){
+      let getMovies = `
+        SELECT Movies.title, Crew.*
+        FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId 
+        WHERE Movies.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ? 
+        LIMIT ?,30;
+      `;
       [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
+      if (movies.length == 0) {
+        itemNum -= 30;
+        [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
+      }
+    } else {
+      let getMovies = `
+        SELECT MoviesInGenre.title, Crew.*
+        FROM 
+          (SELECT Movies.* FROM Movies INNER JOIN MovieGenres ON Movies.movieId=MovieGenres.movieId WHERE MovieGenres.genreId = ?) AS MoviesInGenre
+        INNER JOIN Crew ON MoviesInGenre.movieId=Crew.movieId
+        WHERE MoviesInGenre.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ?
+        LIMIT ?,30;
+      `;
+      [movies, fields] = await connection.execute(getMovies, [`${genreId}`,`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
+      if (movies.length == 0) {
+        itemNum -= 30;
+        [movies, fields] = await connection.execute(getMovies, [`${genreId}`,`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
+      }
     }
-
     // set the used columns as selected by the user
     const shownColQuery = req.query.shownCols;
     const colQuery = req.query.col;
@@ -44,8 +60,18 @@ router.get('/', async function(req, res) {
       }
     });
 
+    const getGenre = `
+      SELECT * 
+      FROM Genres
+      ORDER BY genreId;
+    `;
+    const [genres, fieldsG] = await connection.execute(getGenre);
+
     // render the data
-    res.render('films', { title: 'Films', data: movies, allCols: allCols, shownCols: shownCols, searchQuery: searchQuery, itemNum: itemNum, route: '/films' });
+    res.render('films', { title: 'Films', 
+      data: movies, genres: genres, genreShown: genreId-1,
+      allCols: allCols, shownCols: shownCols, 
+      searchQuery: searchQuery, itemNum: itemNum, route: '/films' });
   } catch (err) {
     console.error('Error from films/', err);
     res.render('error', { message: 'from films/', error: err});
