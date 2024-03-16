@@ -13,14 +13,6 @@ html
 
     p Here you can see all the information about your chosen film, including its genres, tags, and ratings.
 
-
-    if movie.posterUrl
-      // Display the image with specified size under the dropdown
-      img(src=movie.posterUrl alt=movie.title + " Poster" style="width: 250px; height: auto; display: block; margin: 0 auto;")
-    else
-      p No poster URL found
-    
-
     table 
       thead 
         th Id 
@@ -37,26 +29,36 @@ html
         td #{movie.TopTwoActors.slice(1,movie.TopTwoActors.length-1).split(', ').map(actor => actor.slice(1,actor.length-1))}
         td= movie.releaseDate
 
-    table
-      thead
-        tr
-          th
-           p: #[a(href='/genres') Genres]
-      tbody
-        each genre in genres 
-          td= genre.name
-    
-    table
-      thead
-        tr
-          th Tags
-      tbody
-        each tag in tags 
-          td= tag.tag
+    .container(style="display: flex; align-items: flex-start;")
+      if movie.posterUrl
+        .image-container(style="flex: 0 0 300px; margin-left: 70px; margin-top: 20px; margin-bottom: 0px")
+          img(src=movie.posterUrl alt=movie.title + " Poster" style="width: 100%; height: auto;")
+      else
+        p No poster URL found
 
+      .tables-container(style="flex: 1; display: flex; flex-direction: column; margin-left: 10px; margin-right: 20px")
+        table
+          thead
+            tr
+              th 
+                p: a(href='/genres') Genres
+          tbody
+            each genre in genres
+              tr
+                td= genre.name
+
+        table(style="margin-top: 10px;")
+          thead
+            tr
+              th Tags
+          tbody
+            each tag in tags
+              tr
+                td= tag.tag
+
+    canvas#genresChart(width='600', height='200', style="margin-left:20px; margin-right: 50px; margin-top: 0px")
     p
-    canvas#genresChart(width='600', height='200',style="margin-left:30px; margin-right: 70px;")
-    p
+
 
     table
       thead
