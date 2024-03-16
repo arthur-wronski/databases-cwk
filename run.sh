@@ -27,6 +27,8 @@ docker cp ../data/. mysql_container:/var/lib/mysql-files/
 echo "Executing SQL scripts..."
 docker exec -i mysql_container mysql -u root -pyour_root_password < init.sql
 
+echo "Creating the Docker network..."
+docker network create network || true
 
 # Building and running the Docker container for app2
 echo "Building and running Docker container for app2..."
