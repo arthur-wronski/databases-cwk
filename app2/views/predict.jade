@@ -12,6 +12,9 @@ html
       .menu-content
         p: #[a(href='/predict') Predict Performance] #[a(href='/correlate/1&extraversion') Predict Audience]
     
+    p In order to predict the performance of an upcoming film, appropriate chosen tags can be used to provide an estimated rating based on previous films and their tags and ratings. 
+    p To check the accuracy of this estimation, see it apply to other films #[a(href='predict/examples') #[strong here]].
+
     if preview_average == 'NaN' || preview_start == 'NaN' || preview_end == 'NaN'
       p No Previews Added 
     else
@@ -74,7 +77,4 @@ html
                 input(type='hidden', name='tagSearch', id='tagSearch', value=tagSearch)
                 input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
                 button(type='submit') Use Tag
-    
-    p For Proof of Accuracy, see #[a(href='predict/examples') this] page
-
     
