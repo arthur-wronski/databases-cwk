@@ -50,7 +50,7 @@ router.get('/:movieId', async function(req, res) {
         const movie = rowsMovie[0]; // only one as primary
 
         const getTags = `
-            SELECT *
+            SELECT DISTINCT tag
             FROM Tags
             WHERE movieId = ?;
         `;
