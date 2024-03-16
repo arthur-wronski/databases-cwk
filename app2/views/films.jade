@@ -62,6 +62,20 @@ html
                   td #{row.TopTwoActors.slice(1,row.TopTwoActors.length-1).split(', ').map(actor => actor.slice(1,actor.length-1))}
                 else
                   td= row[title]
+    
+    .button_bar
+      form(action=route, method='GET')
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        button(type='submit') Previous Page
+
+    .button_bar
+      form(action=route, method='GET')
+        input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        button(type='submit') Next Page
 
     script.
       document.addEventListener('DOMContentLoaded', function() {

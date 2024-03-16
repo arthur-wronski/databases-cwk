@@ -1,0 +1,60 @@
+doctype html
+html
+  head
+    title= title
+    block stylesheets
+      link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    .dropdown
+      h1= title
+      .dropdown-content
+        p: #[a(href='/') Home] #[a(href='/films') Films] #[a(href='/genres') Genres] #[a(href='/predict') Predict]
+      .dropdown-content
+        p: #[a(href='/predict') Predict Performance] #[a(href='/correlate/1&extraversion') Predict Audience]
+    if start == 'NaN' || end == 'NaN'
+        p This movie shares no tags with other movies in the Database
+    else
+        p Predicted Rating of "#{movieTitle}" by Tag is estimated to be #{average} but more generally in the range [#{start},#{end}]
+        p True Average Rating of "#{movieTitle}" by Reviews is #{true_rating}
+
+
+    .button_bar
+      form(action='/predict/examples', method='GET')
+        label(for='filmSearch')
+        input(type='text', name='filmSearch', id='filmSearch', placeholder='search films')
+        input(type='hidden', name='movieId', id='movieId', value=movieId)
+        input(type='hidden', name='movieTitle', id='movieTitle', value=movieTitle)
+        button(type='submit') Search
+
+    .button_bar
+      form(action='/predict/examples', method='GET')
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum-10)
+        input(type='hidden', name='filmSearch', id='filmSearch', value=filmSearch)
+        input(type='hidden', name='movieId', id='movieId', value=movieId)
+        input(type='hidden', name='movieTitle', id='movieTitle', value=movieTitle)
+        button(type='submit') Previous Page
+
+    .button_bar
+      form(action='/predict/examples', method='GET')
+        input(type='hidden', name='itemNum', id='itemNum', value=itemNum+10)
+        input(type='hidden', name='filmSearch', id='filmSearch', value=filmSearch)
+        input(type='hidden', name='movieId', id='movieId', value=movieId)
+        input(type='hidden', name='movieTitle', id='movieTitle', value=movieTitle)
+        button(type='submit') Next Page
+
+    table
+      thead
+        tr
+          th Movie
+          th 
+      tbody
+        each movie in movies
+          tr
+            td= movie.title
+            td
+              form(action='/predict/examples', method='GET')
+                input(type='hidden', name='movieId', id='movieId', value=movie.movieId)
+                input(type='hidden', name='movieTitle', id='movieTitle', value=movie.title)
+                input(type='hidden', name='filmSearch', id='filmSearch', value=filmSearch)
+                input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
+                button(type='submit') Compare Prediction

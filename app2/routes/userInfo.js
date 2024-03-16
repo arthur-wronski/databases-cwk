@@ -27,7 +27,10 @@ router.get('/:userId', async function(req, res) {
       LIMIT ?, 10;
     `;
     let [movies,fieldsM] = await connection.execute(getRatings_Movie, [`${userId}`, `%${searchQuery}%`, `${itemNum}`]);
-    if (movies.length < 10) itemNum -= 10;
+    if (movies.length == 0) {
+      itemNum -= 10;
+      [movies,fieldsM] = await connection.execute(getRatings_Movie, [`${userId}`, `%${searchQuery}%`, `${itemNum}`]);
+    }
     
     movies.forEach(rating => {
       if (rating.watchDate) {
