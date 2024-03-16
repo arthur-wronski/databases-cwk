@@ -108,6 +108,9 @@ background-color: #00bfff;
   border: none;
   cursor: pointer;
 }
+.dropdown-header:hover + .dropdown-content {
+  display: block;
+}
 
 .dropdown-content {
   display: none;
@@ -120,6 +123,9 @@ background-color: #00bfff;
   overflow-y: auto; 
   width: 100%;
   border: none;
+}
+.dropdown-content:hover {
+  display: block;
 }
 
 .dropdown-content button {
