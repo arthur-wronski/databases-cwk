@@ -11,7 +11,7 @@ router.get('/:genreTrait', async function(req, res) {
   try {
     connection = await pool.getConnection();
 
-    const [genre, trait] = (req.params.genreTrait || '1&extraversion').split('&');
+    const [genre, trait] = (req.params.genreTrait || '12&extraversion').split('&');
 
     const genreId = parseInt(InputSanitizer.sanitizeString(genre));
     let getGenre = `
@@ -24,7 +24,7 @@ router.get('/:genreTrait', async function(req, res) {
 
     const traits = ['openness',  'agreeableness', 'emotional_stability', 'conscientiousness', 'extraversion'];
     const currentTrait = InputSanitizer.sanitizeString(trait);
-    /* 
+    
     let getTraitVals = `
       SELECT Personality.${currentTrait} AS traitVal, ThisGenreRatings.rating
       FROM Personality 
@@ -36,9 +36,8 @@ router.get('/:genreTrait', async function(req, res) {
       ) AS ThisGenreRatings
       ORDER BY Personality.${currentTrait};
     `;
-    let [traitVals, fieldsTV] = await connection.execute(getTraitVals, [`${currentGenre.genreId}`]);
-    */
-    let traitRate = [{traitVal: 0.5, rating: 4}, {traitVal: 1, rating: 1}, {traitVal: 2, rating: 3}];
+    let [traitRate, fieldsTV] = await connection.execute(getTraitVals, [`${currentGenre.genreId}`]);
+  
     const traitRateVars = {traitVal: 'metric', rating: 'metric'};
     const stats = new Statistics(traitRate, traitRateVars);
     const regression = stats.linearRegression('traitVal', 'rating');
@@ -49,7 +48,6 @@ router.get('/:genreTrait', async function(req, res) {
         regression: {coefficient: regression.correlationCoefficient.toPrecision(3), 
           pointStart: regression.regressionSecond.beta1, pointEnd: 10*regression.regressionSecond.beta2 + regression.regressionSecond.beta1},
         data: traitRate.map(pair => [pair.traitVal,pair.rating,'X'])
-        //traitVals: traitVals
     })
 
   } catch (err) {
