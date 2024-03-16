@@ -18,29 +18,29 @@ router.get('/', async function(req, res) {
     let movies; let fields;
     if (genreId == 0){
       let getMovies = `
-        SELECT Movies.title, Crew.*
-        FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId 
-        WHERE Movies.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ? 
+        SELECT DISTINCT Movies.title, Crew.*
+        FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId INNER JOIN Tags ON Movies.movieId=Tags.movieId
+        WHERE Movies.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ? OR Tags.tag LIKE ?
         LIMIT ?,30;
       `;
-      [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
+      [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
       if (movies.length == 0) {
         itemNum -= 30;
-        [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
+        [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
       }
     } else {
       let getMovies = `
-        SELECT MoviesInGenre.title, Crew.*
+        SELECT DISTINCT MoviesInGenre.title, Crew.*
         FROM 
           (SELECT Movies.* FROM Movies INNER JOIN MovieGenres ON Movies.movieId=MovieGenres.movieId WHERE MovieGenres.genreId = ?) AS MoviesInGenre
-        INNER JOIN Crew ON MoviesInGenre.movieId=Crew.movieId
-        WHERE MoviesInGenre.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ?
+        INNER JOIN Crew ON MoviesInGenre.movieId=Crew.movieId INNER JOIN Tags ON MoviesInGenre.movieId=Tags.movieId
+        WHERE MoviesInGenre.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ? OR Tags.tag LIKE ?
         LIMIT ?,30;
       `;
-      [movies, fields] = await connection.execute(getMovies, [`${genreId}`,`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
+      [movies, fields] = await connection.execute(getMovies, [`${genreId}`,`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
       if (movies.length == 0) {
         itemNum -= 30;
-        [movies, fields] = await connection.execute(getMovies, [`${genreId}`,`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
+        [movies, fields] = await connection.execute(getMovies, [`${genreId}`,`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
       }
     }
     // set the used columns as selected by the user
@@ -69,7 +69,7 @@ router.get('/', async function(req, res) {
 
     // render the data
     res.render('films', { title: 'Films', 
-      data: movies, genres: genres, genreShown: genreId-1,
+      data: movies, genres: genres, genreShown: genreId,
       allCols: allCols, shownCols: shownCols, 
       searchQuery: searchQuery, itemNum: itemNum, route: '/films' });
   } catch (err) {

@@ -18,9 +18,13 @@ html
     .button_bar
       form(action=route, method='GET')
         label(for='searchQuery')
-        input(type='text', name='searchQuery', id='searchQuery', placeholder='search keywords')
+        if searchQuery == '%'
+          input(type='text', name='searchQuery', id='searchQuery', placeholder='search keywords')
+        else
+          input(type='text', name='searchQuery', id='searchQuery', placeholder=searchQuery)
         input(type='hidden', name='col', id='col', value=col)
         input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
+        input(type='hidden', name='genreId', id='genreId', value=genreShown)
         button(type='submit') Search
 
     .button_bar
@@ -28,6 +32,7 @@ html
         input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
         input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
         input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        input(type='hidden', name='genreId', id='genreId', value=genreShown)
         button(type='submit') Previous Page
 
     .button_bar
@@ -35,6 +40,7 @@ html
         input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
         input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
         input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        input(type='hidden', name='genreId', id='genreId', value=genreShown)
         button(type='submit') Next Page
 
     .button_bar
@@ -48,12 +54,13 @@ html
                 input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
                 input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
                 input(type='hidden', name='itemNum', id='itemNum', value=itemNum)
+                input(type='hidden', name='genreId', id='genreId', value=genreShown)
                 button(type='submit') #{col}
     
     .button_bar
       .dropdown
-        if genreShown >= 0
-          .dropdown-header(onclick='toggleDropdown(this)') #{genres[genreShown].name}
+        if genreShown != 0
+          .dropdown-header(onclick='toggleDropdown(this)') #{genres[genreShown-1].name}
         else 
           .dropdown-header(onclick='toggleDropdown(this)') Choose Genre
         .dropdown-content
@@ -90,6 +97,7 @@ html
         input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
         input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
         input(type='hidden', name='itemNum', id='itemNum', value=itemNum-30)
+        input(type='hidden', name='genreId', id='genreId', value=genreShown)
         button(type='submit') Previous Page
 
     .button_bar
@@ -97,6 +105,7 @@ html
         input(type='hidden', name='shownCols', id='shownCols', value=shownCols)
         input(type='hidden', name='searchQuery', id='searchQuery', value=searchQuery)
         input(type='hidden', name='itemNum', id='itemNum', value=itemNum+30)
+        input(type='hidden', name='genreId', id='genreId', value=genreShown)
         button(type='submit') Next Page
 
     script.

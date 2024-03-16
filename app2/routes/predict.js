@@ -21,7 +21,6 @@ router.get('/', async function(req, res) {
       FROM Tags WHERE tag LIKE ?
       LIMIT ?,5;
     `;
-    // LAST PAGE JUMP BACK TWICE - FIX
     let [tags, fieldsT] = await connection.execute(getTags, [`%${tagSearch}%`, `${itemNum}`]);
     if (tags.length == 0) {
       itemNum -= 5;
