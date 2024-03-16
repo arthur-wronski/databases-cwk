@@ -111,14 +111,14 @@ OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE '/var/lib/mysql-files/streamlined_personality.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/cleaned_personalities.csv'
 INTO TABLE Personality
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE '/var/lib/mysql-files/streamlined_ratings.csv'
+LOAD DATA INFILE '/var/lib/mysql-files/cleaned_streamlined_ratings.csv'
 INTO TABLE PersonalityRatings
 FIELDS TERMINATED BY ','
 OPTIONALLY ENCLOSED BY '"'

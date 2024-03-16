@@ -74,10 +74,65 @@ def preprocess_crew(links_file_path, crew_file_path, cleaned_crew_file_path):
                     'TopTwoActors': row['Top Two Actors'],
                     'releaseDate': release_date if release_date else '' 
                 })
+def preprocess_personalities(file_path):
+    user_personalities = {}
 
+    with open(file_path, newline='', mode='r', encoding='utf-8') as infile:
+        reader = csv.DictReader(infile)
+
+        for row in reader:
+            user_id = row['userId']
+            personality_ratings = ','.join([row['openness'], row['agreeableness'], row['emotional_stability'], row['conscientiousness'], row['extraversion']])
+            
+            if user_id in user_personalities:
+                user_personalities[user_id] = personality_ratings
+            else:
+                user_personalities[user_id] = personality_ratings
+    
+    with open("../data/cleaned_personalities.csv", 'w', newline='', encoding='utf-8') as outfile:
+        writer = csv.writer(outfile)
+        writer.writerow(['userID', 'openness', 'agreeableness', 'emotional_stability', 'conscientiousness', 'extraversion'])
+        for user_id, ratings in user_personalities.items():
+            ratings_list = ratings.split(',')
+            writer.writerow([user_id] + ratings_list)
+
+def clean_ratings(input_file, output_file, allowed_ids):
+    allowed_user_ids, allowed_movie_ids = allowed_ids
+    processed_user_ids = set() 
+
+    with open(input_file, newline='', mode='r', encoding='utf-8') as infile, \
+         open(output_file, 'w', newline='', encoding='utf-8') as outfile:
+
+        reader = csv.DictReader(infile)
+        writer = csv.DictWriter(outfile, fieldnames=reader.fieldnames)
+        writer.writeheader()
+
+        for row in reader:
+            if row['userId'] in allowed_user_ids and row['movieId'] in allowed_movie_ids:
+                if row['userId'] not in processed_user_ids:
+                    writer.writerow(row)
+                    processed_user_ids.add(row['userId']) 
+
+
+def get_allowed_ids(personality_file, movie_genres_file):
+    allowed_user_ids = set()
+    with open(personality_file, newline='', mode='r', encoding='utf-8') as infile:
+        reader = csv.DictReader(infile)
+        for row in reader:
+            allowed_user_ids.add(row['userId'])
+    
+    allowed_movie_ids = set()
+    with open(movie_genres_file, newline='', mode='r', encoding='utf-8') as infile:
+        reader = csv.DictReader(infile)
+        for row in reader:
+            allowed_movie_ids.add(row['movieId'])
+    
+    return allowed_user_ids, allowed_movie_ids
 
 
 
 preprocess_movies("../data/movies.csv")
+preprocess_personalities("../data/streamlined_personality.csv")
 preprocess_ratings("../data/ratings.csv")
 preprocess_crew("../data/links.csv", "../data/crew.csv", "../data/cleaned_crew.csv")
+clean_ratings("../data/streamlined_ratings.csv", "../data/cleaned_streamlined_ratings.csv", get_allowed_ids("../data/streamlined_personality.csv", "../data/movie_genres.csv"))
