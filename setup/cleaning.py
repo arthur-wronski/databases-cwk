@@ -1,7 +1,11 @@
 import csv
 from datetime import datetime
 
+#script is used to preprocess all the csv files as they need to be in a specific format before SQL import
+# also clean instances of repeat rows or missing data
+
 def preprocess_movies(file_path):
+    #using a set to remove any potential duplicate instances
     genres_set = set()
     movie_genres = []
 
@@ -11,27 +15,33 @@ def preprocess_movies(file_path):
             movie_id = row['movieId']
             title = row['title']
             genres_str = row['genres']
+            #reformats the genres to be in a list rather than being in a string with separator
             genres_list = genres_str.split('|')
             for genre in genres_list:
                 genres_set.add(genre)
             movie_genres.append((movie_id, title, genres_list))
 
     genres_list = list(genres_set)
+    #assigns id to each genre present in dataset for referencing in movie_genres table
     genre_to_id = {genre: i + 1 for i, genre in enumerate(genres_list)}
 
     with open("../data/cleaned_movies.csv", 'w', newline='', encoding='utf-8') as movies_outfile:
+        #cleaned movies will just have movie Id and title, 
+        # rest of info like genre or crew will be fetched through other tables referencing movieId
         writer = csv.writer(movies_outfile)
         writer.writerow(['movieId', 'title'])
         for movie_id, title, _ in movie_genres:
             writer.writerow([movie_id, title])
 
     with open("../data/genres.csv", 'w', newline='', encoding='utf-8') as genres_outfile:
+        # maps newly created genreId to the actual name of the genre
         writer = csv.writer(genres_outfile)
         writer.writerow(['genreId', 'name'])
         for genre, id in genre_to_id.items():
             writer.writerow([id, genre])
 
     with open("../data/movie_genres.csv", 'w', newline='', encoding='utf-8') as movie_genres_outfile:
+        #maps movieId to all of that movie's genres(using genreId)
         writer = csv.writer(movie_genres_outfile)
         writer.writerow(['movieId', 'genreId'])
         for movie_id, _, genres in movie_genres:
@@ -39,6 +49,7 @@ def preprocess_movies(file_path):
                 writer.writerow([movie_id, genre_to_id[genre]])
 
 def preprocess_ratings(file_path):
+    #only thing it does is convert timestamp in epoch ms to normal yyyy-mm-dd format
     with open(file_path, newline='', mode='r', encoding='utf-8') as infile, \
          open("../data/cleaned_ratings.csv", 'w', newline='', encoding='utf-8') as outfile:
         reader = csv.DictReader(infile)
@@ -46,13 +57,16 @@ def preprocess_ratings(file_path):
         writer.writerow(['userId', 'movieId', 'rating', 'date'])
         for row in reader:
             timestamp = int(row['timestamp'])
-            date = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d')
+            #converts timestamp to date
+            date = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d')
             writer.writerow([row['userId'], row['movieId'], row['rating'], date])
 
 def preprocess_crew(links_file_path, crew_file_path, cleaned_crew_file_path):
+    # had to use links file to map the id's in crew to the id's used in all our other csv files
     tmdb_to_movie_id = {}
     with open(links_file_path, newline='', mode='r', encoding='utf-8') as links_file:
         links_reader = csv.DictReader(links_file)
+        #populates dict with all the mappings we are interested in
         for row in links_reader:
             if row['movieId']:  
                 tmdb_to_movie_id[row['tmdbId']] = row['movieId']
@@ -75,6 +89,7 @@ def preprocess_crew(links_file_path, crew_file_path, cleaned_crew_file_path):
                     'releaseDate': release_date if release_date else '' 
                 })
 def preprocess_personalities(file_path):
+    #use dict to remove identical rows or rows with same userID as can't have duplicate keys
     user_personalities = {}
 
     with open(file_path, newline='', mode='r', encoding='utf-8') as infile:
@@ -84,10 +99,7 @@ def preprocess_personalities(file_path):
             user_id = row['userId']
             personality_ratings = ','.join([row['openness'], row['agreeableness'], row['emotional_stability'], row['conscientiousness'], row['extraversion']])
             
-            if user_id in user_personalities:
-                user_personalities[user_id] = personality_ratings
-            else:
-                user_personalities[user_id] = personality_ratings
+            user_personalities[user_id] = personality_ratings
     
     with open("../data/cleaned_personalities.csv", 'w', newline='', encoding='utf-8') as outfile:
         writer = csv.writer(outfile)
@@ -97,7 +109,10 @@ def preprocess_personalities(file_path):
             writer.writerow([user_id] + ratings_list)
 
 def clean_ratings(input_file, output_file, allowed_ids):
+    #due to personality ratings table referencing personality table in DB architecture
+    #ratings file can't have any userIds or movieIDs not present in personality file
     allowed_user_ids, allowed_movie_ids = allowed_ids
+    #avoid duplicated user Id's
     processed_user_ids = set() 
 
     with open(input_file, newline='', mode='r', encoding='utf-8') as infile, \
@@ -115,6 +130,7 @@ def clean_ratings(input_file, output_file, allowed_ids):
 
 
 def get_allowed_ids(personality_file, movie_genres_file):
+    #essentially just stores all the userIds and movieIds present in personality file and avoids duplicates
     allowed_user_ids = set()
     with open(personality_file, newline='', mode='r', encoding='utf-8') as infile:
         reader = csv.DictReader(infile)
