@@ -11,16 +11,25 @@ router.get('/:genreTrait', async function(req, res) {
   try {
     connection = await pool.getConnection();
 
-    const [genre, trait] = (req.params.genreTrait || '12&extraversion').split('&');
+    const [genre, trait] = (req.params.genreTrait).split('&');
 
-    const genreId = parseInt(InputSanitizer.sanitizeString(genre));
+    // only take genres which have ratings in the Personality & PersonalityRatings tables
     let getGenre = `
-        SELECT *
-        FROM Genres
-        ORDER BY genreId;
+        SELECT DISTINCT Genres.*
+        FROM Genres 
+          INNER JOIN MovieGenres ON Genres.genreId=MovieGenres.genreId 
+          INNER JOIN PersonalityRatings ON MovieGenres.movieId=PersonalityRatings.movieId
+        ORDER BY Genres.genreId;
     `;
     let [genres, fieldsG] = await connection.execute(getGenre);
-    const currentGenre = genres[genreId-1];
+
+    let genreId = genres[0].genreId;
+    if (genre.length > 0) genreId = parseInt(InputSanitizer.sanitizeString(genre));
+
+    let currentGenre = { genreId: genreId, name: ''};
+    for (var i=0; i<genres.length; i++){
+      if (genres[i].genreId == genreId)  currentGenre.name = genres[i].name;
+    }
 
     const traits = ['openness',  'agreeableness', 'emotional_stability', 'conscientiousness', 'extraversion'];
     const currentTrait = InputSanitizer.sanitizeString(trait);
@@ -37,19 +46,18 @@ router.get('/:genreTrait', async function(req, res) {
       ORDER BY Personality.${currentTrait};
     `;
     let [traitRate, fieldsTV] = await connection.execute(getTraitVals, [`${currentGenre.genreId}`]);
-  
+
     const traitRateVars = {traitVal: 'metric', rating: 'metric'};
     const stats = new Statistics(traitRate, traitRateVars);
     const regression = stats.linearRegression('traitVal', 'rating');
 
     res.render('personality_genre', {
-        genres: genres, traits: traits, 
+        genres: genres, traits: traits,
         currentGenre: currentGenre, currentTrait: currentTrait,
         regression: {coefficient: regression.correlationCoefficient.toPrecision(3), 
           pointStart: regression.regressionSecond.beta1, pointEnd: 10*regression.regressionSecond.beta2 + regression.regressionSecond.beta1},
         data: traitRate.map(pair => [pair.traitVal,pair.rating,'X'])
-    })
-
+    });
   } catch (err) {
     console.error('Error from correlate/', err);
     res.render('error', { message: 'Error in correlate', error: err });
