@@ -6,8 +6,6 @@ import aiohttp
 import pandas as pd
 from dotenv import load_dotenv
 
-# It's generally not recommended to hard-code API keys in your scripts.
-# I'm using your provided key here for demonstration, but consider using environment variables for better security.
 TMDB_API_KEY = 'e88c5436cbcf0301d32556f967d83f45'
 
 REQUESTS_SEMAPHORE = asyncio.Semaphore(40)
@@ -49,13 +47,12 @@ async def gather_data():
             formatted_movie = {
                 'id': row.movieId,
                 'title': response['title'],
-                'imdb_id': str(row.imdbId),  # Adjusted to string assuming IMDB IDs include alphanumeric characters
+                'imdb_id': str(row.imdbId),  
                 'tmdb_id': row.tmdbId,
                 'poster_path': response['poster_path']
             }
             formatted_movies.append(formatted_movie)
 
-    # Adjusted the path to save the output in the 'data' folder of your project
     with open('./data/selected_movies_data.json', 'w') as outfile:
         json.dump(formatted_movies, outfile, indent=4)
 
