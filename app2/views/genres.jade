@@ -21,7 +21,7 @@ html
           th Average Rating
       tbody
         each genre in genres
-          tr
+          tr(class='row-link', data-url=`/films`)
             td= genre.genreId
             td= genre.name
             td= genre.average_rating
@@ -91,4 +91,14 @@ html
             }
           }
         }
+      });
+
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.row-link').forEach(function(element) {
+          element.addEventListener('click', function() {
+            const url = this.dataset.url;
+            window.location.href = url;
+          });
+        });
       });
