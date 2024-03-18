@@ -56,7 +56,10 @@ router.get('/', async function(req, res) {
 
     let usedPreviews = [];
     if (req.query.usedPreviews!=null && req.query.usedPreviews!='') usedPreviews = req.query.usedPreviews.split(',').map(prev=>parseFloat(prev));
-    if (req.query.new_preview) usedPreviews.push(parseFloat(req.query.new_preview));
+    if (req.query.new_preview) {
+      let new_preview = parseFloat(req.query.new_preview)
+      if (new_preview <= 5 && new_preview >= 0) usedPreviews.push(new_preview);
+    }
     let preview_average = 0;
     let exp_2 = 0;
     for (var i=0; i<usedPreviews.length; i++) {
