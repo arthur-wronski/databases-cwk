@@ -89,6 +89,8 @@ html
               if title != 'movieId'
                 if title == 'TopTwoActors'
                   td #{row.TopTwoActors.slice(1,row.TopTwoActors.length-1).split(', ').map(actor => actor.slice(1,actor.length-1))}
+                else if title == 'rating'
+                  td #{parseFloat(row.rating).toPrecision(3)}
                 else
                   td= row[title]
     

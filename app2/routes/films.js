@@ -18,9 +18,14 @@ router.get('/', async function(req, res) {
     let movies; let fields;
     if (genreId == 0){
       let getMovies = `
-        SELECT DISTINCT Movies.title, Crew.*
-        FROM Movies INNER JOIN Crew ON Movies.movieId=Crew.movieId INNER JOIN Tags ON Movies.movieId=Tags.movieId
+        SELECT DISTINCT Movies.title, Crew.*, AVG(Viewer.rating) AS rating
+        FROM Movies 
+          INNER JOIN Crew ON Movies.movieId=Crew.movieId 
+          INNER JOIN Tags ON Movies.movieId=Tags.movieId
+          INNER JOIN Viewer ON Movies.movieId=Viewer.movieId
         WHERE Movies.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ? OR Tags.tag LIKE ?
+        GROUP BY Viewer.movieId
+        ORDER BY rating DESC
         LIMIT ?,30;
       `;
       [movies, fields] = await connection.execute(getMovies, [`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
@@ -30,11 +35,15 @@ router.get('/', async function(req, res) {
       }
     } else {
       let getMovies = `
-        SELECT DISTINCT MoviesInGenre.title, Crew.*
+        SELECT DISTINCT MoviesInGenre.title, Crew.*, AVG(Viewer.rating) AS rating
         FROM 
           (SELECT Movies.* FROM Movies INNER JOIN MovieGenres ON Movies.movieId=MovieGenres.movieId WHERE MovieGenres.genreId = ?) AS MoviesInGenre
-        INNER JOIN Crew ON MoviesInGenre.movieId=Crew.movieId INNER JOIN Tags ON MoviesInGenre.movieId=Tags.movieId
+          INNER JOIN Crew ON MoviesInGenre.movieId=Crew.movieId 
+          INNER JOIN Tags ON MoviesInGenre.movieId=Tags.movieId
+          INNER JOIN Viewer ON MoviesInGenre.movieId=Viewer.movieId
         WHERE MoviesInGenre.title LIKE ? OR Crew.Director LIKE ? OR Crew.TopTwoActors LIKE ? OR Tags.tag LIKE ?
+        GROUP BY Viewer.movieId
+        ORDER BY rating DESC
         LIMIT ?,30;
       `;
       [movies, fields] = await connection.execute(getMovies, [`${genreId}`,`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`, `${itemNum}`]);
